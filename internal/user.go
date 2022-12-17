@@ -3,6 +3,6 @@ package internal
 type Email string
 
 type User struct {
-	userId int
+	UserId uint
 	Email  Email
 }

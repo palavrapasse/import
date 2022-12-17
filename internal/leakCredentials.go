@@ -1,6 +1,6 @@
 package internal
 
 type LeakCredentials struct {
-	LeakId int
-	CredId int
+	LeakId uint
+	CredId uint
 }

@@ -1,6 +1,6 @@
 package internal
 
 type BadActor struct {
-	badId      int
+	BaId      uint
 	Identifier string
 }

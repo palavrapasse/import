@@ -1,6 +1,6 @@
 package internal
 
 type Platform struct {
-	platId int
+	PlatId uint
 	Name   string
 }
