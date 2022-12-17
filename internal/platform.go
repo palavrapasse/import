@@ -1,6 +1,6 @@
 package internal
 
 type Platform struct {
-	PlatId uint
+	PlatId AutoGenKey
 	Name   string
 }

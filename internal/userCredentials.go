@@ -1,6 +1,6 @@
 package internal
 
 type UserCredentials struct {
-	UserId uint
-	CredId uint
+	UserId AutoGenKey
+	CredId AutoGenKey
 }

@@ -1,6 +1,6 @@
 package internal
 
 type LeakUser struct {
-	LeakId uint
-	UserId uint
+	LeakId AutoGenKey
+	UserId AutoGenKey
 }
