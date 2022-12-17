@@ -3,6 +3,6 @@ package internal
 type Password string
 
 type Credentials struct {
-	credId   int
+	CredId   uint
 	Password Password
 }

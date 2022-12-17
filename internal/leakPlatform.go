@@ -1,6 +1,6 @@
 package internal
 
 type LeakPlatform struct {
-	LeakId int
-	PlatId int
+	LeakId uint
+	PlatId uint
 }

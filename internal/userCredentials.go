@@ -1,6 +1,6 @@
 package internal
 
 type UserCredentials struct {
-	UserId int
-	CredId int
+	UserId uint
+	CredId uint
 }
