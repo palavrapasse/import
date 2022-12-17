@@ -3,6 +3,6 @@ package internal
 type Password string
 
 type Credentials struct {
-	CredId   uint
+	CredId   AutoGenKey
 	Password Password
 }

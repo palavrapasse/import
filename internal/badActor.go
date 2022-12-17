@@ -1,6 +1,6 @@
 package internal
 
 type BadActor struct {
-	BaId      uint
+	BaId       AutoGenKey
 	Identifier string
 }
