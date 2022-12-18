@@ -5,9 +5,10 @@ type HashUser struct {
 	HSHA256 HSHA256
 }
 
-func NewHashUser(hsha256 HSHA256) HashUser {
+func NewHashUser(userId AutoGenKey, hsha256 HSHA256) HashUser {
 
 	return HashUser{
+		UserId:  userId,
 		HSHA256: hsha256,
 	}
 
