@@ -29,7 +29,7 @@ func checkIfPlatformNameConstraintsAreMet(n string) error {
 	size := len(n)
 
 	if size == 0 {
-		return errors.New("platform name can not be nil or empty")
+		return errors.New("platform name can not be empty")
 	}
 
 	if size > 30 {

@@ -57,7 +57,7 @@ func checkIfContextConstraintsAreMet(c string) error {
 	size := len(c)
 
 	if size == 0 {
-		return errors.New("leak context can not be nil or empty")
+		return errors.New("leak context can not be empty")
 	}
 
 	if size > 130 {
