@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	DateLayout = "2006-01-02T15:04:05.000Z"
+	DateFormatLayout = "2006-01-02T15:04:05.000Z"
 )
 
-type DateSeconds int64 // Epoch time in Seconds
+type DateInSeconds int64 // Epoch time in Seconds
 
 type Context string
 
@@ -20,7 +20,7 @@ type Leak struct {
 	Context     Context
 }
 
-func NewDateSeconds(date string) DateSeconds {
+func NewDateSeconds(date string) (DateSeconds, err) {
 	var ds DateSeconds
 
 	t, err := time.Parse(DateLayout, date)
@@ -28,6 +28,8 @@ func NewDateSeconds(date string) DateSeconds {
 	if err != nil {
 		ds = DateSeconds(t.Unix())
 	}
+	
+	return ds, err
 
 	return ds
 }

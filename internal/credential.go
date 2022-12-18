@@ -8,14 +8,11 @@ type Credentials struct {
 }
 
 func NewPassword(password string) Password {
-
 	return Password(password)
 }
 
 func NewCredentials(password Password) Credentials {
-
 	return Credentials{
 		Password: password,
 	}
-
 }

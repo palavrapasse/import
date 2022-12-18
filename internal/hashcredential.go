@@ -6,7 +6,6 @@ type HashCredentials struct {
 }
 
 func NewHashCredentials(credId AutoGenKey, hsha256 HSHA256) HashCredentials {
-
 	return HashCredentials{
 		CredId:  credId,
 		HSHA256: hsha256,

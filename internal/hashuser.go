@@ -6,7 +6,6 @@ type HashUser struct {
 }
 
 func NewHashUser(userId AutoGenKey, hsha256 HSHA256) HashUser {
-
 	return HashUser{
 		UserId:  userId,
 		HSHA256: hsha256,
