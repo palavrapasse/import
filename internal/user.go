@@ -16,11 +16,13 @@ type User struct {
 func NewUser(email string) (User, error) {
 	var u User
 
-	err := checkIfEmailConstraintsAreMet(email)
+
+        emailTrim := strings.TrimSpace(email)
+	err := checkIfEmailConstraintsAreMet(emailTrim)	
 
 	if err == nil {
 		u = User{
-			Email: Email(email),
+			Email: Email(emailTrim),
 		}
 	}
 
