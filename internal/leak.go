@@ -3,26 +3,51 @@ package internal
 import (
 	"errors"
 	"strings"
+	"time"
+)
 
-	"go.starlark.net/lib/time"
+const (
+	DateLayout = "2006-01-02T15:04:05.000Z"
 )
 
 type DateSeconds int64 // Epoch time in Seconds
-type context string
+
+type Context string
 
 type Leak struct {
 	LeakId      AutoGenKey
 	ShareDateSC DateSeconds
-	Context     context
+	Context     Context
+}
+
+func NewDateSeconds(date string) DateSeconds {
+	var ds DateSeconds
+
+	t, err := time.Parse(DateLayout, date)
+
+	if err != nil {
+		ds = DateSeconds(t.Unix())
+	}
+
+	return ds
+}
+
+func (ds DateSeconds) String() string {
+	timeUnix := time.Unix(int64(ds), 0)
+
+	return timeUnix.Format(DateLayout)
 }
 
 func NewLeak(context string, shareDateSC DateSeconds) (Leak, error) {
+	var l Leak
 
-	l := Leak{
-		ShareDateSC: currentTime.Unix(),
+	err := checkIfContextConstraintsAreMet(context)
+
+	if err == nil {
+		l = Leak{
+			Context: Context(context),
+		}
 	}
-
-	err := l.SetContext(context)
 
 	return l, err
 }
@@ -35,10 +60,8 @@ func checkIfContextConstraintsAreMet(c string) error {
 	}
 
 	if size > 130 {
-		return errors.New("leak context exceeds 130 characters")
+		return errors.New("leak context constraints are not met (max 130 characters)")
 	}
-
-	l.Context = context(c)
 
 	return nil
 }
