@@ -11,20 +11,20 @@ type BadActor struct {
 }
 
 func NewBadActor(identifier string) (BadActor, error) {
-	val ba BadActor
-	
+	var ba BadActor
+
 	err := checkIfIdentifierConstraintsAreMet(identifier)
-	
+
 	if err == nil {
-	  ba := BadActor {
-	    Identifier: identifier
-	  }
+		ba = BadActor{
+			Identifier: identifier,
+		}
 	}
 
 	return ba, err
 }
 
-func checkIfIdentifierConstraintsAreMet (identifier string) error {
+func checkIfIdentifierConstraintsAreMet(identifier string) error {
 	size := len(strings.TrimSpace(identifier))
 
 	if size == 0 {
@@ -34,8 +34,6 @@ func checkIfIdentifierConstraintsAreMet (identifier string) error {
 	if size > 30 {
 		return errors.New("bad actor identifier constraints are not met (max 30 characters)")
 	}
-
-	b.Identifier = identifier
 
 	return nil
 }

@@ -11,9 +11,15 @@ type Platform struct {
 }
 
 func NewPlatform(name string) (Platform, error) {
-	p := Platform{}
+	var p Platform
 
-	err := p.SetName(name)
+	err := checkIfPlatformNameConstraintsAreMet(name)
+
+	if err == nil {
+		p = Platform{
+			Name: name,
+		}
+	}
 
 	return p, err
 }
@@ -26,10 +32,8 @@ func checkIfPlatformNameConstraintsAreMet(n string) error {
 	}
 
 	if size > 30 {
-		return errors.New("platform name exceeds 30 characters")
+		return errors.New("platform name constraints are not met (max 30 characters)")
 	}
-
-	p.Name = n
 
 	return nil
 }

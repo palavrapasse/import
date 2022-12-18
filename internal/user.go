@@ -14,30 +14,29 @@ type User struct {
 }
 
 func NewUser(email string) (User, error) {
-	u := User{}
+	var u User
 
-	err := u.SetEmail(email)
+	err := checkIfEmailConstraintsAreMet(email)
+
+	if err == nil {
+		u = User{
+			Email: Email(email),
+		}
+	}
 
 	return u, err
 }
 
-func (u *User) SetEmail(e string) error {
-	size := len(strings.TrimSpace(e))
-
-	if size == 0 {
-		return errors.New("user email can not be nil or empty")
-	}
-
-	if size > 130 {
-		return errors.New("user email exceeds 130 characters")
-	}
-
+func checkIfEmailConstraintsAreMet(e string) error {
 	_, err := mail.ParseAddress(e)
+
 	if err != nil {
 		return err
 	}
 
-	u.Email = Email(e)
+	if len(strings.TrimSpace(e)) > 130 {
+		return errors.New("user email constraints are not met (max 130 characters)")
+	}
 
 	return nil
 }
