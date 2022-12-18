@@ -16,34 +16,33 @@ type Context string
 
 type Leak struct {
 	LeakId      AutoGenKey
-	ShareDateSC DateSeconds
+	ShareDateSC DateInSeconds
 	Context     Context
 }
 
-func NewDateSeconds(date string) (DateSeconds, err) {
-	var ds DateSeconds
+func NewDateSeconds(date string) (DateInSeconds, error) {
+	var ds DateInSeconds
 
-	t, err := time.Parse(DateLayout, date)
+	t, err := time.Parse(DateFormatLayout, date)
 
 	if err != nil {
-		ds = DateSeconds(t.Unix())
+		ds = DateInSeconds(t.Unix())
 	}
-	
-	return ds, err
 
-	return ds
+	return ds, err
 }
 
-func (ds DateSeconds) String() string {
+func (ds DateInSeconds) String() string {
 	timeUnix := time.Unix(int64(ds), 0)
 
-	return timeUnix.Format(DateLayout)
+	return timeUnix.Format(DateFormatLayout)
 }
 
-func NewLeak(context string, shareDateSC DateSeconds) (Leak, error) {
+func NewLeak(context string, shareDateSC DateInSeconds) (Leak, error) {
 	var l Leak
 
-	err := checkIfContextConstraintsAreMet(context)
+	contextTrim := strings.TrimSpace(context)
+	err := checkIfContextConstraintsAreMet(contextTrim)
 
 	if err == nil {
 		l = Leak{
@@ -55,7 +54,7 @@ func NewLeak(context string, shareDateSC DateSeconds) (Leak, error) {
 }
 
 func checkIfContextConstraintsAreMet(c string) error {
-	size := len(strings.TrimSpace(c))
+	size := len(c)
 
 	if size == 0 {
 		return errors.New("leak context can not be nil or empty")

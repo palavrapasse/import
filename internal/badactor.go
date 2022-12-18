@@ -13,7 +13,8 @@ type BadActor struct {
 func NewBadActor(identifier string) (BadActor, error) {
 	var ba BadActor
 
-	err := checkIfIdentifierConstraintsAreMet(identifier)
+	identifierTrim := strings.TrimSpace(identifier)
+	err := checkIfIdentifierConstraintsAreMet(identifierTrim)
 
 	if err == nil {
 		ba = BadActor{
@@ -25,7 +26,7 @@ func NewBadActor(identifier string) (BadActor, error) {
 }
 
 func checkIfIdentifierConstraintsAreMet(identifier string) error {
-	size := len(strings.TrimSpace(identifier))
+	size := len(identifier)
 
 	if size == 0 {
 		return errors.New("bad actor identifier can not be empty")

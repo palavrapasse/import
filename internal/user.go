@@ -16,9 +16,8 @@ type User struct {
 func NewUser(email string) (User, error) {
 	var u User
 
-
-        emailTrim := strings.TrimSpace(email)
-	err := checkIfEmailConstraintsAreMet(emailTrim)	
+	emailTrim := strings.TrimSpace(email)
+	err := checkIfEmailConstraintsAreMet(emailTrim)
 
 	if err == nil {
 		u = User{
@@ -36,7 +35,7 @@ func checkIfEmailConstraintsAreMet(e string) error {
 		return err
 	}
 
-	if len(strings.TrimSpace(e)) > 130 {
+	if len(e) > 130 {
 		return errors.New("user email constraints are not met (max 130 characters)")
 	}
 
