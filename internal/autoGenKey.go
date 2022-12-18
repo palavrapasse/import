@@ -1,3 +1,3 @@
 package internal
 
-type AutoGenKey uint
+type AutoGenKey int64
