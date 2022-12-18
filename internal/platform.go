@@ -13,7 +13,8 @@ type Platform struct {
 func NewPlatform(name string) (Platform, error) {
 	var p Platform
 
-	err := checkIfPlatformNameConstraintsAreMet(name)
+	nameTrim := strings.TrimSpace(name)
+	err := checkIfPlatformNameConstraintsAreMet(nameTrim)
 
 	if err == nil {
 		p = Platform{
@@ -25,7 +26,7 @@ func NewPlatform(name string) (Platform, error) {
 }
 
 func checkIfPlatformNameConstraintsAreMet(n string) error {
-	size := len(strings.TrimSpace(n))
+	size := len(n)
 
 	if size == 0 {
 		return errors.New("platform name can not be nil or empty")
