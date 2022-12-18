@@ -16,8 +16,7 @@ type Leak struct {
 	Context     context
 }
 
-func NewLeak(context string) (Leak, error) {
-	currentTime := time.Now()
+func NewLeak(context string, shareDateSC DateSeconds) (Leak, error) {
 
 	l := Leak{
 		ShareDateSC: currentTime.Unix(),
@@ -28,7 +27,7 @@ func NewLeak(context string) (Leak, error) {
 	return l, err
 }
 
-func (l *Leak) SetContext(c string) error {
+func checkIfContextConstraintsAreMet(c string) error {
 	size := len(strings.TrimSpace(c))
 
 	if size == 0 {

@@ -18,7 +18,7 @@ func NewPlatform(name string) (Platform, error) {
 	return p, err
 }
 
-func (p *Platform) SetName(n string) error {
+func checkIfPlatformNameConstraintsAreMet(n string) error {
 	size := len(strings.TrimSpace(n))
 
 	if size == 0 {

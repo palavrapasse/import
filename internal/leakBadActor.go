@@ -1,6 +1,6 @@
 package internal
 
 type LeakBadActor struct {
-	LeakId AutoGenKey
 	BaId   AutoGenKey
+	LeakId AutoGenKey
 }
