@@ -28,6 +28,13 @@ func NewUser(email string) (User, error) {
 	return u, err
 }
 
+func (u User) Copy(key AutoGenKey) User {
+	return User{
+		UserId: key,
+		Email:  u.Email,
+	}
+}
+
 func checkIfEmailConstraintsAreMet(e string) error {
 	_, err := mail.ParseAddress(e)
 

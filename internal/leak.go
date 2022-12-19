@@ -46,11 +46,19 @@ func NewLeak(context string, shareDateSC DateInSeconds) (Leak, error) {
 
 	if err == nil {
 		l = Leak{
-			Context: Context(context),
+			Context: Context(contextTrim),
 		}
 	}
 
 	return l, err
+}
+
+func (l Leak) Copy(key AutoGenKey) Leak {
+	return Leak{
+		LeakId:      key,
+		ShareDateSC: l.ShareDateSC,
+		Context:     l.Context,
+	}
 }
 
 func checkIfContextConstraintsAreMet(c string) error {
