@@ -3,16 +3,16 @@ package main
 import (
 	"log"
 
-	"github.com/palavrapasse/import/internal"
+	"github.com/palavrapasse/import/internal/entity"
 )
 
 func main() {
 	log.Println("** Import Project **")
 
-	baId := internal.AutoGenKey(10)
+	baId := entity.AutoGenKey(10)
 	log.Println(baId)
 
-	badActor := internal.BadActor{
+	badActor := entity.BadActor{
 		BaId:       baId,
 		Identifier: "Identifier",
 	}
