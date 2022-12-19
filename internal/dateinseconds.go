@@ -10,12 +10,12 @@ const (
 
 type DateInSeconds int64 // Epoch time in Seconds
 
-func NewDateSeconds(date string) (DateInSeconds, error) {
+func NewDateInSeconds(date string) (DateInSeconds, error) {
 	var ds DateInSeconds
 
 	t, err := time.Parse(DateFormatLayout, date)
 
-	if err != nil {
+	if err == nil {
 		ds = DateInSeconds(t.Unix())
 	}
 
