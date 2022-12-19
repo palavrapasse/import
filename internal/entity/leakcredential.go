@@ -1,4 +1,4 @@
-package internal
+package entity
 
 type LeakCredentials struct {
 	CredId AutoGenKey

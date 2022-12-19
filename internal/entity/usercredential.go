@@ -1,4 +1,4 @@
-package internal
+package entity
 
 type UserCredentials struct {
 	CredId AutoGenKey
