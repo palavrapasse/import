@@ -16,3 +16,10 @@ func NewCredentials(password Password) Credentials {
 		Password: password,
 	}
 }
+
+func (c Credentials) Copy(key AutoGenKey) Credentials {
+	return Credentials{
+		CredId:   key,
+		Password: c.Password,
+	}
+}

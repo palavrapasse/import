@@ -18,11 +18,18 @@ func NewBadActor(identifier string) (BadActor, error) {
 
 	if err == nil {
 		ba = BadActor{
-			Identifier: identifier,
+			Identifier: identifierTrim,
 		}
 	}
 
 	return ba, err
+}
+
+func (ba BadActor) Copy(key AutoGenKey) BadActor {
+	return BadActor{
+		BaId:       key,
+		Identifier: ba.Identifier,
+	}
 }
 
 func checkIfIdentifierConstraintsAreMet(identifier string) error {

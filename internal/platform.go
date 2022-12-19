@@ -18,11 +18,18 @@ func NewPlatform(name string) (Platform, error) {
 
 	if err == nil {
 		p = Platform{
-			Name: name,
+			Name: nameTrim,
 		}
 	}
 
 	return p, err
+}
+
+func (p Platform) Copy(key AutoGenKey) Platform {
+	return Platform{
+		PlatId: key,
+		Name:   p.Name,
+	}
 }
 
 func checkIfPlatformNameConstraintsAreMet(n string) error {
