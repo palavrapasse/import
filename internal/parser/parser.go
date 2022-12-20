@@ -2,6 +2,6 @@ package parser
 
 import "github.com/palavrapasse/import/internal/entity"
 
-type LeaksParser interface {
-	Parse() ([]entity.Leak, error)
+type LeakParser interface {
+	Parse() (entity.LeakParse, []error)
 }

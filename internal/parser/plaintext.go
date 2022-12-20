@@ -13,36 +13,40 @@ import (
 var separatorsSupported = []string{",", ";"}
 
 const (
-	ContextPosition = 0
-	DatePosition    = 1
+	EmailPosition    = 0
+	PasswordPosition = 1
 )
 
 type PlainTextLeaksParser struct {
 	FilePath string
 }
 
-func (p PlainTextLeaksParser) Parse() ([]entity.Leak, error) {
+func (p PlainTextLeaksParser) Parse() (entity.LeakParse, []error) {
+	var errors []error
+
 	lines, err := getFileLines(p.FilePath)
 
 	if err != nil {
-		return nil, err
+		errors = append(errors, err)
+		return nil, errors
 	}
 
-	size := len(lines)
-	leaks := make([]entity.Leak, size)
+	leaks := make(map[entity.User]entity.Credentials)
 
-	for i, line := range lines {
-		leak, err := lineToLeak(line)
+	for _, line := range lines {
+		user, credential, err := lineToUserCredential(line)
 
-		if err != nil {
-			leaks[i] = leak
+		if err == nil {
+			leaks[user] = credential
+		} else {
+			errors = append(errors, err)
 		}
 	}
 
-	return leaks, nil
+	return leaks, errors
 }
 
-func lineToLeak(line string) (entity.Leak, error) {
+func lineToUserCredential(line string) (entity.User, entity.Credentials, error) {
 
 	containsSeparator := false
 	separator := ""
@@ -55,26 +59,24 @@ func lineToLeak(line string) (entity.Leak, error) {
 	}
 
 	if !containsSeparator {
-		return entity.Leak{}, fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
+		return entity.User{}, entity.Credentials{}, fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
 	}
 
 	lineSplit := strings.Split(line, separator)
 
-	context := string(lineSplit[ContextPosition])
-	date := string(lineSplit[DatePosition])
-	ds, err := entity.NewDateInSeconds(date)
+	email := string(lineSplit[EmailPosition])
+	u, err := entity.NewUser(email)
 
 	if err != nil {
-		return entity.Leak{}, err
+		return entity.User{}, entity.Credentials{}, err
 	}
 
-	leak, err := entity.NewLeak(context, ds)
+	password := string(lineSplit[PasswordPosition])
+	p := entity.NewPassword(password)
 
-	if err != nil {
-		return entity.Leak{}, err
-	}
+	c := entity.NewCredentials(p)
 
-	return leak, nil
+	return u, c, nil
 }
 
 func getFileLines(filePath string) ([]string, error) {
