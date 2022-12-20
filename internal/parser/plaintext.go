@@ -21,7 +21,7 @@ type PlainTextLeaksParser struct {
 	FilePath string
 }
 
-func (p PlainTextLeaksParser) ParseLeaks() ([]entity.Leak, error) {
+func (p PlainTextLeaksParser) Parse() ([]entity.Leak, error) {
 	lines, err := getFileLines(p.FilePath)
 
 	if err != nil {
