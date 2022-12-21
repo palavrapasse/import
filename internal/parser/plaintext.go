@@ -17,11 +17,11 @@ const (
 	PasswordPosition = 1
 )
 
-type PlainTextLeaksParser struct {
+type PlainTextLeakParser struct {
 	FilePath string
 }
 
-func (p PlainTextLeaksParser) Parse() (entity.LeakParse, []error) {
+func (p PlainTextLeakParser) Parse() (entity.LeakParse, []error) {
 	var errors []error
 
 	lines, err := getFileLines(p.FilePath)
@@ -31,19 +31,7 @@ func (p PlainTextLeaksParser) Parse() (entity.LeakParse, []error) {
 		return nil, errors
 	}
 
-	leaks := make(map[entity.User]entity.Credentials)
-
-	for _, line := range lines {
-		user, credential, err := lineToUserCredential(line)
-
-		if err == nil {
-			leaks[user] = credential
-		} else {
-			errors = append(errors, err)
-		}
-	}
-
-	return leaks, errors
+	return linesToLeakParse(lines)
 }
 
 func lineToUserCredential(line string) (entity.User, entity.Credentials, error) {
@@ -59,7 +47,9 @@ func lineToUserCredential(line string) (entity.User, entity.Credentials, error) 
 	}
 
 	if !containsSeparator {
-		return entity.User{}, entity.Credentials{}, fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
+		return entity.User{},
+			entity.Credentials{},
+			fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
 	}
 
 	lineSplit := strings.Split(line, separator)
@@ -77,6 +67,23 @@ func lineToUserCredential(line string) (entity.User, entity.Credentials, error) 
 	c := entity.NewCredentials(p)
 
 	return u, c, nil
+}
+
+func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
+	var errors []error
+	leak := entity.LeakParse{}
+
+	for _, line := range lines {
+		user, credential, err := lineToUserCredential(line)
+
+		if err == nil {
+			leak[user] = credential
+		} else {
+			errors = append(errors, err)
+		}
+	}
+
+	return leak, errors
 }
 
 func getFileLines(filePath string) ([]string, error) {

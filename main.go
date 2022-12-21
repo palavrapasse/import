@@ -9,7 +9,7 @@ import (
 func main() {
 	log.Println("** Import Project **")
 
-	var parser parser.LeakParser = parser.PlainTextLeaksParser{
+	var parser parser.LeakParser = parser.PlainTextLeakParser{
 		FilePath: "./plaintext.txt",
 	}
 
