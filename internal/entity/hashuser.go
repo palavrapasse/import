@@ -1,4 +1,4 @@
-package internal
+package entity
 
 type HashUser struct {
 	UserId  AutoGenKey

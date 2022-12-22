@@ -3,18 +3,17 @@ package main
 import (
 	"log"
 
-	"github.com/palavrapasse/import/internal"
+	"github.com/palavrapasse/import/internal/parser"
 )
 
 func main() {
 	log.Println("** Import Project **")
 
-	baId := internal.AutoGenKey(10)
-	log.Println(baId)
-
-	badActor := internal.BadActor{
-		BaId:       baId,
-		Identifier: "Identifier",
+	var parser parser.LeakParser = parser.PlainTextLeakParser{
+		FilePath: "./plaintext.txt",
 	}
-	log.Println(badActor)
+
+	leakParse, errors := parser.Parse()
+	log.Println(errors)
+	log.Println(leakParse)
 }
