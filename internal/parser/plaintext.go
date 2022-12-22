@@ -57,7 +57,11 @@ func lineToUserCredential(line string, separator string) (entity.User, entity.Cr
 	}
 
 	password := string(lineSplit[PasswordPosition])
-	p := entity.NewPassword(password)
+	p, err := entity.NewPassword(password)
+
+	if err != nil {
+		return entity.User{}, entity.Credentials{}, err
+	}
 
 	c := entity.NewCredentials(p)
 
@@ -79,19 +83,20 @@ func findSeparator(line string) (string, error) {
 func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
 	var errors []error
 	leak := entity.LeakParse{}
-	separator := ""
+
+	if len(lines) == 0 {
+		errors = append(errors, fmt.Errorf("File is empty"))
+		return leak, errors
+	}
+
+	separator, err := findSeparator(lines[0])
+
+	if err != nil {
+		errors = append(errors, err)
+		return leak, errors
+	}
 
 	for _, line := range lines {
-
-		if separator == "" {
-			var err error
-			separator, err = findSeparator(line)
-
-			if err != nil {
-				errors = append(errors, err)
-				continue
-			}
-		}
 
 		user, credential, err := lineToUserCredential(line, separator)
 

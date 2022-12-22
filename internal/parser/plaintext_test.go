@@ -2,6 +2,20 @@ package parser
 
 import "testing"
 
+func TestCannotParseEmptyLines(t *testing.T) {
+	lines := []string{}
+
+	_, err := linesToLeakParse(lines)
+
+	if err == nil {
+		t.Fatalf("Lines designated by the string below contains multiple lines which are invalid, but no error was identified\nString: %s", lines)
+	}
+
+	if len(err) != 1 {
+		t.Fatalf("Lines is empty so it should contain one error")
+	}
+}
+
 func TestCannotParseLinesToLeakWithOnlyOneLineWhichIsInvalid(t *testing.T) {
 	lines := []string{"fghj2@aaa"}
 
@@ -13,7 +27,7 @@ func TestCannotParseLinesToLeakWithOnlyOneLineWhichIsInvalid(t *testing.T) {
 }
 
 func TestCannotParseLinesToLeakWithMultipleLinesWhichAreInvalid(t *testing.T) {
-	lines := []string{"fghj2@aaa", "fghj2,dghf", ",dghf", "fghj2,", ",dghf", "fghj2,", ",dg,hf,"}
+	lines := []string{"fghj2@aaa,", "fghj2,dghf", ",dghf", "fghj2,", ",dghf", "fghj2,", ",dg,hf,"}
 
 	_, err := linesToLeakParse(lines)
 
@@ -26,8 +40,22 @@ func TestCannotParseLinesToLeakWithMultipleLinesWhichAreInvalid(t *testing.T) {
 	}
 }
 
+func TestCannotParseLinesToLeakWithFirstLineWithoutValidSeparator(t *testing.T) {
+	lines := []string{"fghj2@aaa", "fghj2,dghf", ",dghf", "fghj2,", ",dghf", "fghj2,", ",dg,hf,"}
+
+	_, err := linesToLeakParse(lines)
+
+	if err == nil {
+		t.Fatalf("Lines designated by the string below contains multiple lines which are invalid, but no error was identified\nString: %s", lines)
+	}
+
+	if len(err) != 1 {
+		t.Fatalf("The first line of Lines designated by the string below does not contain a valid separator so it should contain one error\nString: %s", lines)
+	}
+}
+
 func TestCanParseLinesToLeakWithSomeInvalidLines(t *testing.T) {
-	lines := []string{"fghj2@aaa", "fghj2@aaa;dghf", "fghj2@aaa,dghf"}
+	lines := []string{"fghj2@aaa,", "fghj2@aaa;dghf", "fghj2@aaa,dghf"}
 
 	leak, err := linesToLeakParse(lines)
 
