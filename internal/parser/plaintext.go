@@ -47,9 +47,8 @@ func lineToUserCredential(line string) (entity.User, entity.Credentials, error) 
 	}
 
 	if !containsSeparator {
-		return entity.User{},
-			entity.Credentials{},
-			fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
+		err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
+		return entity.User{}, entity.Credentials{}, err
 	}
 
 	lineSplit := strings.Split(line, separator)
