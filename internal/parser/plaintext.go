@@ -85,7 +85,7 @@ func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
 	leak := entity.LeakParse{}
 
 	if len(lines) == 0 {
-		errors = append(errors, fmt.Errorf("File is empty"))
+		errors = append(errors, fmt.Errorf("Can't process empty leak"))
 		return leak, errors
 	}
 
