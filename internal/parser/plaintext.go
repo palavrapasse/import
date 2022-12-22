@@ -37,11 +37,6 @@ func (p PlainTextLeakParser) Parse() (entity.LeakParse, []error) {
 
 func lineToUserCredential(line string, separator string) (entity.User, entity.Credentials, error) {
 
-	if separator == "" {
-		err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
-		return entity.User{}, entity.Credentials{}, err
-	}
-
 	if !strings.Contains(line, separator) {
 		err := fmt.Errorf("Input incorrect. Line %v should the separator (%v)", line, separator)
 		return entity.User{}, entity.Credentials{}, err
@@ -69,28 +64,33 @@ func lineToUserCredential(line string, separator string) (entity.User, entity.Cr
 	return u, c, nil
 }
 
-func findSeparator(line string) string {
+func findSeparator(line string) (string, error) {
 
 	for _, separator := range separatorsSupported {
 		if strings.Contains(line, separator) {
-			return separator
+			return separator, nil
 		}
 	}
 
-	return ""
+	err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
+	return "", err
 }
 
 func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
 	var errors []error
 	leak := entity.LeakParse{}
-	count := len(lines)
 	separator := ""
 
-	for i := 0; i < count; i++ {
-		line := lines[i]
+	for _, line := range lines {
 
 		if separator == "" {
-			separator = findSeparator(line)
+			var err error
+			separator, err = findSeparator(line)
+
+			if err != nil {
+				errors = append(errors, err)
+				continue
+			}
 		}
 
 		user, credential, err := lineToUserCredential(line, separator)
