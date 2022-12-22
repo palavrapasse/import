@@ -15,6 +15,7 @@ var separatorsSupported = []string{",", ";"}
 const (
 	EmailPosition    = 0
 	PasswordPosition = 1
+	NumberPositions  = 2
 )
 
 type PlainTextLeakParser struct {
@@ -34,24 +35,24 @@ func (p PlainTextLeakParser) Parse() (entity.LeakParse, []error) {
 	return linesToLeakParse(lines)
 }
 
-func lineToUserCredential(line string) (entity.User, entity.Credentials, error) {
+func lineToUserCredential(line string, separator string) (entity.User, entity.Credentials, error) {
 
-	containsSeparator := false
-	separator := ""
-
-	for _, separator = range separatorsSupported {
-		if strings.Contains(line, separator) {
-			containsSeparator = true
-			break
-		}
-	}
-
-	if !containsSeparator {
+	if separator == "" {
 		err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
 		return entity.User{}, entity.Credentials{}, err
 	}
 
+	if !strings.Contains(line, separator) {
+		err := fmt.Errorf("Input incorrect. Line %v should the separator (%v)", line, separator)
+		return entity.User{}, entity.Credentials{}, err
+	}
+
 	lineSplit := strings.Split(line, separator)
+
+	if len(lineSplit) != NumberPositions {
+		err := fmt.Errorf("Input incorrect. Line %v should contain email and password information", line)
+		return entity.User{}, entity.Credentials{}, err
+	}
 
 	email := string(lineSplit[EmailPosition])
 	u, err := entity.NewUser(email)
@@ -68,12 +69,31 @@ func lineToUserCredential(line string) (entity.User, entity.Credentials, error) 
 	return u, c, nil
 }
 
+func findSeparator(line string) string {
+
+	for _, separator := range separatorsSupported {
+		if strings.Contains(line, separator) {
+			return separator
+		}
+	}
+
+	return ""
+}
+
 func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
 	var errors []error
 	leak := entity.LeakParse{}
+	count := len(lines)
+	separator := ""
 
-	for _, line := range lines {
-		user, credential, err := lineToUserCredential(line)
+	for i := 0; i < count; i++ {
+		line := lines[i]
+
+		if separator == "" {
+			separator = findSeparator(line)
+		}
+
+		user, credential, err := lineToUserCredential(line, separator)
 
 		if err == nil {
 			leak[user] = credential

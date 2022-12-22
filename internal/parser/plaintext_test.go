@@ -13,7 +13,7 @@ func TestCannotParseLinesToLeakWithOnlyOneLineWhichIsInvalid(t *testing.T) {
 }
 
 func TestCannotParseLinesToLeakWithMultipleLinesWhichAreInvalid(t *testing.T) {
-	lines := []string{"fghj2@aaa", "fghj2,dghf"}
+	lines := []string{"fghj2@aaa", "fghj2,dghf", ",dghf", "fghj2,", ",dghf", "fghj2,", ",dg,hf,"}
 
 	_, err := linesToLeakParse(lines)
 
@@ -27,7 +27,7 @@ func TestCannotParseLinesToLeakWithMultipleLinesWhichAreInvalid(t *testing.T) {
 }
 
 func TestCanParseLinesToLeakWithSomeInvalidLines(t *testing.T) {
-	lines := []string{"fghj2@aaa", "fghj2,dghf", "fghj2@aaa,dghf"}
+	lines := []string{"fghj2@aaa", "fghj2@aaa;dghf", "fghj2@aaa,dghf"}
 
 	leak, err := linesToLeakParse(lines)
 
@@ -41,7 +41,7 @@ func TestCanParseLinesToLeakWithSomeInvalidLines(t *testing.T) {
 }
 
 func TestCanParseLinesToLeakWithOnlyValidLines(t *testing.T) {
-	lines := []string{"test@aaa,dghf", "fghj2@aaa;dghf"}
+	lines := []string{"test@aaa,dghf", "fghj2@aaa,dghf"}
 
 	leak, err := linesToLeakParse(lines)
 
