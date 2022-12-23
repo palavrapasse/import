@@ -28,17 +28,31 @@ type PlainTextLeakParser struct {
 	FilePath string
 }
 
-func (p PlainTextLeakParser) Parse() (entity.LeakParse, []error) {
+func (p PlainTextLeakParser) Parse(ecb ...OnParseErrorCallback) (entity.LeakParse, []error) {
 	var errors []error
 
 	lines, err := getFileLines(p.FilePath)
 
 	if err != nil {
+		processOnParseError(err, ecb...)
 		errors = append(errors, err)
+
 		return nil, errors
 	}
 
-	return linesToLeakParse(lines)
+	return linesToLeakParse(lines, ecb...)
+}
+
+func findSeparator(line string) (string, error) {
+
+	for _, separator := range supportedSeparators {
+		if strings.Contains(line, separator) {
+			return separator, nil
+		}
+	}
+
+	err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(supportedSeparators, " "))
+	return "", err
 }
 
 func lineToUserCredential(line string, separator string) (entity.User, entity.Credentials, error) {
@@ -74,31 +88,25 @@ func lineToUserCredential(line string, separator string) (entity.User, entity.Cr
 	return u, c, nil
 }
 
-func findSeparator(line string) (string, error) {
-
-	for _, separator := range supportedSeparators {
-		if strings.Contains(line, separator) {
-			return separator, nil
-		}
-	}
-
-	err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(supportedSeparators, " "))
-	return "", err
-}
-
-func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
+func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (entity.LeakParse, []error) {
 	var errors []error
 	leak := entity.LeakParse{}
 
 	if len(lines) == 0 {
-		errors = append(errors, fmt.Errorf("Can't process empty leak"))
+		err := fmt.Errorf("Can't process empty leak")
+
+		processOnParseError(err, ecb...)
+		errors = append(errors, err)
+
 		return leak, errors
 	}
 
 	separator, err := findSeparator(lines[0])
 
 	if err != nil {
+		processOnParseError(err, ecb...)
 		errors = append(errors, err)
+
 		return leak, errors
 	}
 
@@ -109,6 +117,7 @@ func linesToLeakParse(lines []string) (entity.LeakParse, []error) {
 		if err == nil {
 			leak[user] = credential
 		} else {
+			processOnParseError(err, ecb...)
 			errors = append(errors, err)
 		}
 	}
