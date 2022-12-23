@@ -1,6 +1,9 @@
 package parser
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestCannotParseEmptyLines(t *testing.T) {
 	lines := []string{}
@@ -79,5 +82,48 @@ func TestCanParseLinesToLeakWithOnlyValidLines(t *testing.T) {
 
 	if len(leak) == 0 {
 		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
+	}
+}
+
+func TestCannotFindUnknownSeparator(t *testing.T) {
+	line := "my.username-my.password"
+
+	sep, err := findSeparator(line)
+
+	if err == nil {
+		t.Fatalf("No valid separator is present in line, but a separator was found: %s\n", sep)
+	}
+}
+
+func TestCanFindCommaSeparator(t *testing.T) {
+	testSep := CommaSeparator
+	line := fmt.Sprintf("my.username%smy.password", testSep)
+
+	sep, _ := findSeparator(line)
+
+	if sep != testSep {
+		t.Fatalf("A comma separator is present in line, but a different separator was found (%s)\n", testSep)
+	}
+}
+
+func TestCanFindColonSeparator(t *testing.T) {
+	testSep := ColonSeparator
+	line := fmt.Sprintf("my.username%smy.password", testSep)
+
+	sep, _ := findSeparator(line)
+
+	if sep != testSep {
+		t.Fatalf("A colon separator is present in line, but a different separator was found (%s)\n", testSep)
+	}
+}
+
+func TestCanFindSemiColonSeparator(t *testing.T) {
+	testSep := SemiColonSeparator
+	line := fmt.Sprintf("my.username%smy.password", testSep)
+
+	sep, _ := findSeparator(line)
+
+	if sep != testSep {
+		t.Fatalf("A semicolon separator is present in line, but a different separator was found (%s)\n", testSep)
 	}
 }

@@ -10,13 +10,19 @@ import (
 	"github.com/palavrapasse/import/internal/entity"
 )
 
-var separatorsSupported = []string{",", ";"}
-
 const (
 	EmailPosition    = 0
 	PasswordPosition = 1
 	NumberPositions  = 2
 )
+
+const (
+	CommaSeparator     = ","
+	ColonSeparator     = ":"
+	SemiColonSeparator = ";"
+)
+
+var supportedSeparators = []string{ColonSeparator, CommaSeparator, SemiColonSeparator}
 
 type PlainTextLeakParser struct {
 	FilePath string
@@ -70,13 +76,13 @@ func lineToUserCredential(line string, separator string) (entity.User, entity.Cr
 
 func findSeparator(line string) (string, error) {
 
-	for _, separator := range separatorsSupported {
+	for _, separator := range supportedSeparators {
 		if strings.Contains(line, separator) {
 			return separator, nil
 		}
 	}
 
-	err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(separatorsSupported, " "))
+	err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(supportedSeparators, " "))
 	return "", err
 }
 
