@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,git,linux,windows,macos
-# Edit at https://www.toptal.com/developers/gitignore?templates=go,visualstudiocode,git,linux,windows,macos
+# Created by https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,git,linux,windows,macos,snyk
+# Edit at https://www.toptal.com/developers/gitignore?templates=go,visualstudiocode,git,linux,windows,macos,snyk
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:
@@ -87,6 +87,10 @@ Temporary Items
 # iCloud generated files
 *.icloud
 
+### Snyk ###
+# DeepCode
+.dccache
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -132,7 +136,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,git,linux,windows,macos
+# End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,git,linux,windows,macos,snyk
 
 # also ignore any .txt files
 
