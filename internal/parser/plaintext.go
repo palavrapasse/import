@@ -3,7 +3,6 @@ package parser
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
@@ -128,7 +127,6 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (entity.LeakP
 func getFileLines(filePath string) ([]string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatalf("Error while opening file: %v", err)
 		return nil, err
 	}
 	defer file.Close()
