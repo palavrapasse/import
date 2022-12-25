@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	prepareInsertStatementSQLString               = "INSERT INTO %s (%s) VALUES (%s)"
+	prepareInsertStatementSQLString               = "INSERT OR IGNORE INTO %s (%s) VALUES (%s)"
 	prepareInsertStatementPlaceholderSymbol       = "?"
 	prepareInsertStatementMultipleFieldsSeparator = ", "
 )

@@ -162,7 +162,7 @@ func TestTableFieldsReturnsUnknownTableIfItDoesNotContainAnyRecord(t *testing.T)
 func TestBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := BadActorTable{Records: Records{entity.BadActor{}}}
 
-	expectedInsertStatement := "INSERT INTO BadActor (identifier) VALUES (?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO BadActor (identifier) VALUES (?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -174,7 +174,7 @@ func TestBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 func TestCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := CredentialsTable{Records: Records{entity.Credentials{}}}
 
-	expectedInsertStatement := "INSERT INTO Credentials (password) VALUES (?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO Credentials (password) VALUES (?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -186,7 +186,7 @@ func TestCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *t
 func TestHashCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := HashCredentialsTable{Records: Records{entity.HashCredentials{}}}
 
-	expectedInsertStatement := "INSERT INTO HashCredentials (credid, hsha256) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO HashCredentials (credid, hsha256) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -198,7 +198,7 @@ func TestHashCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(
 func TestHashUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := HashUserTable{Records: Records{entity.HashUser{}}}
 
-	expectedInsertStatement := "INSERT INTO HashUser (userid, hsha256) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO HashUser (userid, hsha256) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -210,7 +210,7 @@ func TestHashUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 func TestLeakBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := LeakBadActorTable{Records: Records{entity.LeakBadActor{}}}
 
-	expectedInsertStatement := "INSERT INTO LeakBadActor (baid, leakid) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO LeakBadActor (baid, leakid) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -222,7 +222,7 @@ func TestLeakBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *
 func TestLeakCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := LeakCredentialsTable{Records: Records{entity.LeakCredentials{}}}
 
-	expectedInsertStatement := "INSERT INTO LeakCredentials (credid, leakid) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO LeakCredentials (credid, leakid) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -234,7 +234,7 @@ func TestLeakCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(
 func TestLeakPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := LeakPlatformTable{Records: Records{entity.LeakPlatform{}}}
 
-	expectedInsertStatement := "INSERT INTO LeakPlatform (platid, leakid) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO LeakPlatform (platid, leakid) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -246,7 +246,7 @@ func TestLeakPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *
 func TestLeakTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := LeakTable{Records: Records{entity.Leak{}}}
 
-	expectedInsertStatement := "INSERT INTO Leak (sharedatesc, context) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO Leak (sharedatesc, context) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -258,7 +258,7 @@ func TestLeakTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.
 func TestLeakUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := LeakUserTable{Records: Records{entity.LeakUser{}}}
 
-	expectedInsertStatement := "INSERT INTO LeakUser (userid, leakid) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO LeakUser (userid, leakid) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -270,7 +270,7 @@ func TestLeakUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 func TestPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := PlatformTable{Records: Records{entity.Platform{}}}
 
-	expectedInsertStatement := "INSERT INTO Platform (name) VALUES (?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO Platform (name) VALUES (?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -282,7 +282,7 @@ func TestPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 func TestUserCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := UserCredentialsTable{Records: Records{entity.UserCredentials{}}}
 
-	expectedInsertStatement := "INSERT INTO UserCredentials (credid, userid) VALUES (?, ?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO UserCredentials (credid, userid) VALUES (?, ?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 
@@ -294,7 +294,7 @@ func TestUserCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(
 func TestUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
 	tb := UserTable{Records: Records{entity.User{}}}
 
-	expectedInsertStatement := "INSERT INTO User (email) VALUES (?)"
+	expectedInsertStatement := "INSERT OR IGNORE INTO User (email) VALUES (?)"
 
 	insertStatement := tb.prepareInsertStatementString()
 

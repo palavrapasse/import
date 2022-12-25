@@ -11,7 +11,6 @@ type Record interface{}
 type Records []Record
 
 type Field string
-type Value any
 
 func Fields(r Record) []Field {
 	rf := reflectFields(r)
@@ -24,10 +23,10 @@ func Fields(r Record) []Field {
 	return fs
 }
 
-func Values(r Record) []Value {
+func Values(r Record) []any {
 	rf := reflectFields(r)
 	rv := reflect.ValueOf(r)
-	vs := make([]Value, len(rf))
+	vs := make([]any, len(rf))
 
 	for i, f := range rf {
 		vs[i] = rv.FieldByName(f.Name).Interface()
