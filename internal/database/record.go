@@ -37,13 +37,29 @@ func Values(r Record) []Value {
 }
 
 func CopyWithNewKey(r Record, k entity.AutoGenKey) Record {
-	copy := reflect.ValueOf(r).MethodByName("Copy")
+	var rr Record
 
-	if !copy.IsZero() {
-		return copy.Call([]reflect.Value{reflect.ValueOf(k)})[0].Interface()
-	} else {
-		return r
+	switch r.(type) {
+	case entity.BadActor:
+		r, _ := r.(entity.BadActor)
+		rr = r.Copy(k)
+	case entity.Credentials:
+		r, _ := r.(entity.Credentials)
+		rr = r.Copy(k)
+	case entity.Leak:
+		r, _ := r.(entity.Leak)
+		rr = r.Copy(k)
+	case entity.Platform:
+		r, _ := r.(entity.Platform)
+		rr = r.Copy(k)
+	case entity.User:
+		r, _ := r.(entity.User)
+		rr = r.Copy(k)
+	default:
+		rr = r
 	}
+
+	return rr
 }
 
 func reflectFields(r Record) []reflect.StructField {
