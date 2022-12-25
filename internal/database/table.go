@@ -7,6 +7,12 @@ import (
 )
 
 const (
+	prepareInsertStatementSQLString               = "INSERT INTO %s (%s) VALUES (%s)"
+	prepareInsertStatementPlaceholderSymbol       = "?"
+	prepareInsertStatementMultipleFieldsSeparator = ", "
+)
+
+const (
 	unknownTableName = "void"
 )
 
@@ -17,7 +23,7 @@ type Table interface {
 	Name() string
 	Records() []Record
 	Fields() []Field
-	Copy(Records) Table
+	Copy(Records) DatabaseTable
 	PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error)
 }
 
@@ -42,6 +48,39 @@ type PlatformTable = PrimaryTable
 type UserCredentialsTable = ForeignTable
 type UserTable = PrimaryTable
 
+func (pt PrimaryTable) Name() string {
+	return DatabaseTable(pt).Name()
+}
+
+func (ft ForeignTable) Name() string {
+	return DatabaseTable(ft).Name()
+}
+
+func (pt PrimaryTable) Fields() []Field {
+	return DatabaseTable(pt).Fields()
+}
+
+func (ft ForeignTable) Fields() []Field {
+	return DatabaseTable(ft).Fields()
+}
+
+func (pt PrimaryTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
+	return tx.Prepare(pt.prepareInsertStatementString())
+
+}
+
+func (ft ForeignTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
+	return tx.Prepare(ft.prepareInsertStatementString())
+}
+
+func (pt PrimaryTable) Copy(rs Records) PrimaryTable {
+	return PrimaryTable{Records: rs}
+}
+
+func (ft ForeignTable) Copy(rs Records) ForeignTable {
+	return ForeignTable{Records: rs}
+}
+
 func (t DatabaseTable) Name() string {
 	rs := t.Records
 
@@ -62,15 +101,6 @@ func (t DatabaseTable) Fields() []Field {
 	}
 }
 
-func (pt PrimaryTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
-	return tx.Prepare(pt.prepareInsertStatementString())
-
-}
-
-func (ft ForeignTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
-	return tx.Prepare(ft.prepareInsertStatementString())
-}
-
 func (pt PrimaryTable) prepareInsertStatementString() string {
 	tableName := pt.Name()
 	tableFields := pt.Fields()[1:]
@@ -86,12 +116,12 @@ func (ft ForeignTable) prepareInsertStatementString() string {
 }
 
 func prepareInsertStatementString(tableName string, tableFields []Field) string {
-	tablePlaceholders := stringSliceMap(func(v any) string { return "?" }, tableFields)
+	tablePlaceholders := stringSliceMap(func(v any) string { return prepareInsertStatementPlaceholderSymbol }, tableFields)
 
-	tableFieldsJoin := strings.Join(toStringSlice(tableFields), ", ")
-	tablePlaceholdersJoin := strings.Join(toStringSlice(tablePlaceholders), ", ")
+	tableFieldsJoin := strings.Join(toStringSlice(tableFields), prepareInsertStatementMultipleFieldsSeparator)
+	tablePlaceholdersJoin := strings.Join(toStringSlice(tablePlaceholders), prepareInsertStatementMultipleFieldsSeparator)
 
-	return fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", tableName, tableFieldsJoin, tablePlaceholdersJoin)
+	return fmt.Sprintf(prepareInsertStatementSQLString, tableName, tableFieldsJoin, tablePlaceholdersJoin)
 }
 
 func toStringSlice[T any](s []T) []string {

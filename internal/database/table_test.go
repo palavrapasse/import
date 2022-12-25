@@ -302,3 +302,17 @@ func TestUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.
 		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
 	}
 }
+
+func TestCopyReturnsDatabaseTableWithNewRecords(t *testing.T) {
+	oldRecords := Records{entity.User{UserId: 1}}
+	newRecords := Records{entity.User{UserId: 2}}
+
+	oldTable := UserTable{Records: oldRecords}
+	expectedNewTable := UserTable{Records: newRecords}
+
+	copyTable := oldTable.Copy(newRecords)
+
+	if !reflect.DeepEqual(copyTable.Records, expectedNewTable.Records) {
+		t.Fatalf("Copy should have return a database table with new records, but got: %v", copyTable.Records)
+	}
+}
