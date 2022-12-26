@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/palavrapasse/import/internal/entity"
+	. "github.com/palavrapasse/import/internal/entity"
 )
 
 func TestTableNameReturnsUnknownTableNameIfItDoesNotContainAnyRecord(t *testing.T) {
@@ -18,7 +18,7 @@ func TestTableNameReturnsUnknownTableNameIfItDoesNotContainAnyRecord(t *testing.
 }
 
 func TestBadActorTableNameReturnsBadActor(t *testing.T) {
-	tb := BadActorTable{Records: Records{entity.BadActor{}}}
+	tb := NewBadActorTable([]BadActor{{}})
 	expectedTableName := "BadActor"
 
 	name := tb.Name()
@@ -29,7 +29,7 @@ func TestBadActorTableNameReturnsBadActor(t *testing.T) {
 }
 
 func TestCredentialsTableNameReturnsCredentials(t *testing.T) {
-	tb := CredentialsTable{Records: Records{entity.Credentials{}}}
+	tb := NewCredentialsTable([]Credentials{{}})
 	expectedTableName := "Credentials"
 
 	name := tb.Name()
@@ -40,7 +40,7 @@ func TestCredentialsTableNameReturnsCredentials(t *testing.T) {
 }
 
 func TestHashCredentialsTableNameReturnsHashCredentials(t *testing.T) {
-	tb := HashCredentialsTable{Records: Records{entity.HashCredentials{}}}
+	tb := NewHashCredentialsTable([]Credentials{{}})
 	expectedTableName := "HashCredentials"
 
 	name := tb.Name()
@@ -51,7 +51,7 @@ func TestHashCredentialsTableNameReturnsHashCredentials(t *testing.T) {
 }
 
 func TestHashUserTableNameReturnsHashUser(t *testing.T) {
-	tb := HashUserTable{Records: Records{entity.HashUser{}}}
+	tb := NewHashUserTable([]User{{}})
 	expectedTableName := "HashUser"
 
 	name := tb.Name()
@@ -62,7 +62,7 @@ func TestHashUserTableNameReturnsHashUser(t *testing.T) {
 }
 
 func TestLeakBadActorTableNameReturnsLeakBadActor(t *testing.T) {
-	tb := LeakBadActorTable{Records: Records{entity.LeakBadActor{}}}
+	tb := NewLeakBadActorTable(map[Leak][]BadActor{{}: {BadActor{}}})
 	expectedTableName := "LeakBadActor"
 
 	name := tb.Name()
@@ -73,7 +73,7 @@ func TestLeakBadActorTableNameReturnsLeakBadActor(t *testing.T) {
 }
 
 func TestLeakCredentialsTableNameReturnsLeakCredentials(t *testing.T) {
-	tb := LeakCredentialsTable{Records: Records{entity.LeakCredentials{}}}
+	tb := NewLeakCredentialsTable(map[Leak][]Credentials{{}: {Credentials{}}})
 	expectedTableName := "LeakCredentials"
 
 	name := tb.Name()
@@ -84,7 +84,7 @@ func TestLeakCredentialsTableNameReturnsLeakCredentials(t *testing.T) {
 }
 
 func TestLeakPlatformTableNameReturnsLeakPlatform(t *testing.T) {
-	tb := LeakPlatformTable{Records: Records{entity.LeakPlatform{}}}
+	tb := NewLeakPlatformTable(map[Leak][]Platform{{}: {Platform{}}})
 	expectedTableName := "LeakPlatform"
 
 	name := tb.Name()
@@ -95,7 +95,7 @@ func TestLeakPlatformTableNameReturnsLeakPlatform(t *testing.T) {
 }
 
 func TestLeakTableNameReturnsLeak(t *testing.T) {
-	tb := LeakTable{Records: Records{entity.Leak{}}}
+	tb := NewLeakTable(Leak{})
 	expectedTableName := "Leak"
 
 	name := tb.Name()
@@ -106,7 +106,7 @@ func TestLeakTableNameReturnsLeak(t *testing.T) {
 }
 
 func TestLeakUserTableNameReturnsLeakUser(t *testing.T) {
-	tb := LeakUserTable{Records: Records{entity.LeakUser{}}}
+	tb := NewLeakUserTable(map[Leak][]User{{}: {User{}}})
 	expectedTableName := "LeakUser"
 
 	name := tb.Name()
@@ -117,7 +117,7 @@ func TestLeakUserTableNameReturnsLeakUser(t *testing.T) {
 }
 
 func TestPlatformTableNameReturnsPlatform(t *testing.T) {
-	tb := PlatformTable{Records: Records{entity.Platform{}}}
+	tb := NewPlatformTable([]Platform{{}})
 	expectedTableName := "Platform"
 
 	name := tb.Name()
@@ -128,7 +128,7 @@ func TestPlatformTableNameReturnsPlatform(t *testing.T) {
 }
 
 func TestUserCredentialsTableNameReturnsUserCredentials(t *testing.T) {
-	tb := UserCredentialsTable{Records: Records{entity.UserCredentials{}}}
+	tb := NewUserCredentialsTable(map[User]Credentials{{}: {}})
 	expectedTableName := "UserCredentials"
 
 	name := tb.Name()
@@ -139,7 +139,7 @@ func TestUserCredentialsTableNameReturnsUserCredentials(t *testing.T) {
 }
 
 func TestUserTableNameReturnsUser(t *testing.T) {
-	tb := UserTable{Records: Records{entity.User{}}}
+	tb := NewUserTable([]User{{}})
 	expectedTableName := "User"
 
 	name := tb.Name()
@@ -160,7 +160,7 @@ func TestTableFieldsReturnsUnknownTableIfItDoesNotContainAnyRecord(t *testing.T)
 }
 
 func TestBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := BadActorTable{Records: Records{entity.BadActor{}}}
+	tb := NewBadActorTable([]BadActor{{}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO BadActor (identifier) VALUES (?)"
 
@@ -172,7 +172,7 @@ func TestBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 }
 
 func TestCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := CredentialsTable{Records: Records{entity.Credentials{}}}
+	tb := NewCredentialsTable([]Credentials{{}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO Credentials (password) VALUES (?)"
 
@@ -184,7 +184,7 @@ func TestCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *t
 }
 
 func TestHashCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := HashCredentialsTable{Records: Records{entity.HashCredentials{}}}
+	tb := NewHashCredentialsTable([]Credentials{{}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO HashCredentials (credid, hsha256) VALUES (?, ?)"
 
@@ -196,7 +196,7 @@ func TestHashCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(
 }
 
 func TestHashUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := HashUserTable{Records: Records{entity.HashUser{}}}
+	tb := NewHashUserTable([]User{{}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO HashUser (userid, hsha256) VALUES (?, ?)"
 
@@ -208,7 +208,7 @@ func TestHashUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 }
 
 func TestLeakBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := LeakBadActorTable{Records: Records{entity.LeakBadActor{}}}
+	tb := NewLeakBadActorTable(map[Leak][]BadActor{{}: {BadActor{}}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO LeakBadActor (baid, leakid) VALUES (?, ?)"
 
@@ -220,7 +220,7 @@ func TestLeakBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *
 }
 
 func TestLeakCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := LeakCredentialsTable{Records: Records{entity.LeakCredentials{}}}
+	tb := NewLeakCredentialsTable(map[Leak][]Credentials{{}: {Credentials{}}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO LeakCredentials (credid, leakid) VALUES (?, ?)"
 
@@ -232,7 +232,7 @@ func TestLeakCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(
 }
 
 func TestLeakPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := LeakPlatformTable{Records: Records{entity.LeakPlatform{}}}
+	tb := NewLeakPlatformTable(map[Leak][]Platform{{}: {Platform{}}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO LeakPlatform (platid, leakid) VALUES (?, ?)"
 
@@ -244,7 +244,7 @@ func TestLeakPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *
 }
 
 func TestLeakTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := LeakTable{Records: Records{entity.Leak{}}}
+	tb := NewLeakTable(Leak{})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO Leak (sharedatesc, context) VALUES (?, ?)"
 
@@ -256,7 +256,7 @@ func TestLeakTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.
 }
 
 func TestLeakUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := LeakUserTable{Records: Records{entity.LeakUser{}}}
+	tb := NewLeakUserTable(map[Leak][]User{{}: {User{}}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO LeakUser (userid, leakid) VALUES (?, ?)"
 
@@ -268,7 +268,7 @@ func TestLeakUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 }
 
 func TestPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := PlatformTable{Records: Records{entity.Platform{}}}
+	tb := NewPlatformTable([]Platform{{}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO Platform (name) VALUES (?)"
 
@@ -280,7 +280,7 @@ func TestPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *test
 }
 
 func TestUserCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := UserCredentialsTable{Records: Records{entity.UserCredentials{}}}
+	tb := NewUserCredentialsTable(map[User]Credentials{{}: {}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO UserCredentials (credid, userid) VALUES (?, ?)"
 
@@ -292,7 +292,7 @@ func TestUserCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(
 }
 
 func TestUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := UserTable{Records: Records{entity.User{}}}
+	tb := NewUserTable([]User{{}})
 
 	expectedInsertStatement := "INSERT OR IGNORE INTO User (email) VALUES (?)"
 
@@ -303,9 +303,9 @@ func TestUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.
 	}
 }
 
-func TestCopyReturnsDatabaseTableWithNewRecords(t *testing.T) {
-	oldRecords := Records{entity.User{UserId: 1}}
-	newRecords := Records{entity.User{UserId: 2}}
+func TestPrimaryTableCopyReturnsDatabaseTableWithNewRecords(t *testing.T) {
+	oldRecords := Records{User{UserId: 1}}
+	newRecords := Records{User{UserId: 2}}
 
 	oldTable := UserTable{Records: oldRecords}
 	expectedNewTable := UserTable{Records: newRecords}
@@ -314,5 +314,74 @@ func TestCopyReturnsDatabaseTableWithNewRecords(t *testing.T) {
 
 	if !reflect.DeepEqual(copyTable.Records, expectedNewTable.Records) {
 		t.Fatalf("Copy should have return a database table with new records, but got: %v", copyTable.Records)
+	}
+}
+
+func TestForeignTableCopyReturnsDatabaseTableWithNewRecords(t *testing.T) {
+	oldRecords := Records{LeakUser{UserId: 1}}
+	newRecords := Records{LeakUser{UserId: 2}}
+
+	oldTable := LeakUserTable{Records: oldRecords}
+	expectedNewTable := LeakUserTable{Records: newRecords}
+
+	copyTable := oldTable.Copy(newRecords)
+
+	if !reflect.DeepEqual(copyTable.Records, expectedNewTable.Records) {
+		t.Fatalf("Copy should have return a database table with new records, but got: %v", copyTable.Records)
+	}
+}
+
+func TestToBadActorSliceReturnsTableBadActorRecords(t *testing.T) {
+	expectedBadActorSlice := []BadActor{{BaId: 1}, {BaId: 2}}
+
+	bat := NewBadActorTable(expectedBadActorSlice)
+	bas := bat.ToBadActorSlice()
+
+	if !reflect.DeepEqual(bas, expectedBadActorSlice) {
+		t.Fatalf("ToBadActorSlice should have return a slice with all BadActor records, but got: %v", bas)
+	}
+}
+
+func TestToCredentialsSliceReturnsTableCredentialsRecords(t *testing.T) {
+	expectedCredentialsSlice := []Credentials{{CredId: 1}, {CredId: 2}}
+
+	bat := NewCredentialsTable(expectedCredentialsSlice)
+	bas := bat.ToCredentialsSlice()
+
+	if !reflect.DeepEqual(bas, expectedCredentialsSlice) {
+		t.Fatalf("ToCredentialsSlice should have return a slice with all Credentials records, but got: %v", bas)
+	}
+}
+
+func TestToLeakSliceReturnsTableLeakRecords(t *testing.T) {
+	expectedLeakSlice := []Leak{{LeakId: 1}, {LeakId: 2}}
+
+	bat := NewLeakTable(expectedLeakSlice...)
+	bas := bat.ToLeakSlice()
+
+	if !reflect.DeepEqual(bas, expectedLeakSlice) {
+		t.Fatalf("ToLeakSlice should have return a slice with all Leak records, but got: %v", bas)
+	}
+}
+
+func TestToPlatformSliceReturnsTablePlatformRecords(t *testing.T) {
+	expectedPlatformSlice := []Platform{{PlatId: 1}, {PlatId: 2}}
+
+	bat := NewPlatformTable(expectedPlatformSlice)
+	bas := bat.ToPlatformSlice()
+
+	if !reflect.DeepEqual(bas, expectedPlatformSlice) {
+		t.Fatalf("ToPlatformSlice should have return a slice with all Platform records, but got: %v", bas)
+	}
+}
+
+func TestToUserSliceReturnsTableUserRecords(t *testing.T) {
+	expectedUserSlice := []User{{UserId: 1}, {UserId: 2}}
+
+	bat := NewUserTable(expectedUserSlice)
+	bas := bat.ToUserSlice()
+
+	if !reflect.DeepEqual(bas, expectedUserSlice) {
+		t.Fatalf("ToUserSlice should have return a slice with all User records, but got: %v", bas)
 	}
 }

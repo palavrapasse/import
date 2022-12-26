@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+
+	. "github.com/palavrapasse/import/internal/entity"
 )
 
 const (
@@ -47,6 +49,193 @@ type LeakUserTable = ForeignTable
 type PlatformTable = PrimaryTable
 type UserCredentialsTable = ForeignTable
 type UserTable = PrimaryTable
+
+func NewBadActorTable(ba []BadActor) BadActorTable {
+	rs := make(Records, len(ba))
+
+	for i, v := range ba {
+		rs[i] = v
+	}
+
+	return BadActorTable{Records: rs}
+}
+
+func NewCredentialsTable(cr []Credentials) CredentialsTable {
+	rs := make(Records, len(cr))
+
+	for i, v := range cr {
+		rs[i] = v
+	}
+
+	return CredentialsTable{Records: rs}
+}
+
+func NewLeakTable(ls ...Leak) LeakTable {
+	rs := make(Records, len(ls))
+
+	for i, v := range ls {
+		rs[i] = v
+	}
+
+	return LeakTable{Records: rs}
+}
+
+func NewPlatformTable(ps []Platform) PlatformTable {
+	rs := make(Records, len(ps))
+
+	for i, v := range ps {
+		rs[i] = v
+	}
+
+	return PlatformTable{Records: rs}
+}
+
+func NewUserTable(us []User) UserTable {
+	rs := make(Records, len(us))
+
+	for i, v := range us {
+		rs[i] = v
+	}
+
+	return UserTable{Records: rs}
+}
+
+func NewHashCredentialsTable(cr []Credentials) HashCredentialsTable {
+	rs := make(Records, len(cr))
+
+	for i, v := range cr {
+		rs[i] = NewHashCredentials(v.CredId, NewHSHA256(string(v.Password)))
+	}
+
+	return HashCredentialsTable{Records: rs}
+}
+
+func NewHashUserTable(us []User) HashUserTable {
+	rs := make(Records, len(us))
+
+	for i, v := range us {
+		rs[i] = NewHashUser(v.UserId, NewHSHA256(string(v.Email)))
+	}
+
+	return HashUserTable{Records: rs}
+}
+
+func NewLeakBadActorTable(lba map[Leak][]BadActor) LeakBadActorTable {
+	rs := Records{}
+
+	for l, bas := range lba {
+		for _, ba := range bas {
+			rs = append(rs, NewLeakBadActor(ba.BaId, l.LeakId))
+		}
+	}
+
+	return LeakBadActorTable{Records: rs}
+}
+
+func NewLeakCredentialsTable(lcr map[Leak][]Credentials) LeakCredentialsTable {
+	rs := Records{}
+
+	for l, crs := range lcr {
+		for _, cr := range crs {
+			rs = append(rs, NewLeakCredentials(cr.CredId, l.LeakId))
+		}
+	}
+
+	return LeakCredentialsTable{Records: rs}
+}
+
+func NewLeakPlatformTable(lpt map[Leak][]Platform) LeakPlatformTable {
+	rs := Records{}
+
+	for l, pts := range lpt {
+		for _, pt := range pts {
+			rs = append(rs, NewLeakPlatform(pt.PlatId, l.LeakId))
+		}
+	}
+
+	return LeakPlatformTable{Records: rs}
+}
+
+func NewLeakUserTable(lus map[Leak][]User) LeakUserTable {
+	rs := Records{}
+
+	for l, us := range lus {
+		for _, u := range us {
+			rs = append(rs, NewLeakUser(u.UserId, l.LeakId))
+		}
+	}
+
+	return LeakUserTable{Records: rs}
+}
+
+func NewUserCredentialsTable(uc map[User]Credentials) UserCredentialsTable {
+	rs := make(Records, len(uc))
+
+	i := 0
+
+	for u, c := range uc {
+		rs[i] = UserCredentials{CredId: c.CredId, UserId: u.UserId}
+
+		i++
+	}
+
+	return UserCredentialsTable{Records: rs}
+}
+
+func (bat BadActorTable) ToBadActorSlice() []BadActor {
+	bas := make([]BadActor, len(bat.Records))
+
+	for i, r := range bat.Records {
+		ba := r.(BadActor)
+		bas[i] = ba
+	}
+
+	return bas
+}
+
+func (ct CredentialsTable) ToCredentialsSlice() []Credentials {
+	crs := make([]Credentials, len(ct.Records))
+
+	for i, r := range ct.Records {
+		cr := r.(Credentials)
+		crs[i] = cr
+	}
+
+	return crs
+}
+
+func (lt LeakTable) ToLeakSlice() []Leak {
+	ls := make([]Leak, len(lt.Records))
+
+	for i, r := range lt.Records {
+		l := r.(Leak)
+		ls[i] = l
+	}
+
+	return ls
+}
+
+func (pt PlatformTable) ToPlatformSlice() []Platform {
+	ps := make([]Platform, len(pt.Records))
+
+	for i, r := range pt.Records {
+		p := r.(Platform)
+		ps[i] = p
+	}
+
+	return ps
+}
+
+func (ut UserTable) ToUserSlice() []User {
+	us := make([]User, len(ut.Records))
+
+	for i, r := range ut.Records {
+		u := r.(User)
+		us[i] = u
+	}
+
+	return us
+}
 
 func (pt PrimaryTable) Name() string {
 	return DatabaseTable(pt).Name()
