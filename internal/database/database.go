@@ -80,6 +80,10 @@ func (ctx DatabaseContext) Insert(i Import) error {
 			t, err = tctx.insertPrimary(t)
 
 			if err == nil {
+				t, err = tctx.findPrimary(t)
+			}
+
+			if err == nil {
 				ptt[j] = t
 			} else {
 				return
@@ -135,6 +139,43 @@ func (ctx DatabaseContext) Insert(i Import) error {
 	return err
 }
 
+func (ctx TransactionContext) findPrimary(t PrimaryTable) (PrimaryTable, error) {
+	var tx *sql.Tx
+	var stmt *sql.Stmt
+	var err error
+
+	var updatedRecords Records
+
+	tx = ctx.Tx
+
+	stmt, err = t.PrepareFindStatement(tx)
+
+	if err == nil {
+		records := t.Records
+
+		for _, r := range records {
+			if !t.HasPrimaryKeySet(r) {
+				var row *sql.Row
+				var rid int64
+
+				row = stmt.QueryRow(t.FindValues(r)...)
+
+				if row != nil {
+					err = row.Scan(&rid)
+				}
+
+				if err == nil {
+					updatedRecords = append(updatedRecords, CopyWithNewKey(r, AutoGenKey(rid)))
+				}
+			} else {
+				updatedRecords = append(updatedRecords, r)
+			}
+		}
+	}
+
+	return t.Copy(updatedRecords), err
+}
+
 func (ctx TransactionContext) insertPrimary(t PrimaryTable) (PrimaryTable, error) {
 	var tx *sql.Tx
 	var stmt *sql.Stmt
@@ -153,7 +194,7 @@ func (ctx TransactionContext) insertPrimary(t PrimaryTable) (PrimaryTable, error
 			var res sql.Result
 			var lid int64
 
-			res, err = stmt.Exec(t.InsertValues(r))
+			res, err = stmt.Exec(t.InsertValues(r)...)
 
 			if res != nil {
 				lid, err = res.LastInsertId()
@@ -183,7 +224,7 @@ func (ctx TransactionContext) insertForeign(t ForeignTable) (ForeignTable, error
 		records := t.Records
 
 		for _, r := range records {
-			_, err = stmt.Exec(t.InsertValues(r))
+			_, err = stmt.Exec(t.InsertValues(r)...)
 		}
 	}
 
