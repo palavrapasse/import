@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
-	. "github.com/palavrapasse/import/internal"
 	. "github.com/palavrapasse/import/internal/entity"
 )
 
@@ -38,61 +37,6 @@ func NewTransactionContext(db *sql.DB) (TransactionContext, error) {
 	tx, err := db.Begin()
 
 	return TransactionContext{Tx: tx}, err
-}
-
-func (ctx TransactionContext) Insert(t PrimaryTable) (PrimaryTable, error) {
-	var tx *sql.Tx
-	var stmt *sql.Stmt
-	var err error
-
-	var updatedRecords Records
-
-	tx = ctx.Tx
-
-	stmt, err = t.PrepareInsertStatement(tx)
-
-	if err == nil {
-		records := t.Records
-
-		for _, r := range records {
-			var res sql.Result
-			var lid int64
-
-			res, err = stmt.Exec(Values(r)[1:]...)
-
-			if res != nil {
-				lid, err = res.LastInsertId()
-			}
-
-			if err == nil {
-				updatedRecords = append(updatedRecords, CopyWithNewKey(r, AutoGenKey(lid)))
-			}
-		}
-	}
-
-	return t.Copy(updatedRecords), err
-}
-
-func (ctx TransactionContext) Insert2(t ForeignTable) (ForeignTable, error) {
-	var tx *sql.Tx
-	var stmt *sql.Stmt
-	var err error
-
-	var updatedRecords Records
-
-	tx = ctx.Tx
-
-	stmt, err = t.PrepareInsertStatement(tx)
-
-	if err == nil {
-		records := t.Records
-
-		for _, r := range records {
-			_, err = stmt.Exec(Values(r)...)
-		}
-	}
-
-	return t.Copy(updatedRecords), err
 }
 
 func (ctx DatabaseContext) Insert(i Import) error {
@@ -133,7 +77,7 @@ func (ctx DatabaseContext) Insert(i Import) error {
 		ptt := []PrimaryTable{ut, ct, bat, lt, pt}
 
 		for j, t := range ptt {
-			t, err = tctx.Insert(t)
+			t, err = tctx.insertPrimary(t)
 
 			if err == nil {
 				ptt[j] = t
@@ -174,7 +118,7 @@ func (ctx DatabaseContext) Insert(i Import) error {
 		ftt := []ForeignTable{hct, hut, lbat, lcrt, lptt, lut, uct}
 
 		for j, t := range ftt {
-			t, err = tctx.Insert2(t)
+			t, err = tctx.insertForeign(t)
 
 			if err == nil {
 				ftt[j] = t
@@ -189,4 +133,59 @@ func (ctx DatabaseContext) Insert(i Import) error {
 	}
 
 	return err
+}
+
+func (ctx TransactionContext) insertPrimary(t PrimaryTable) (PrimaryTable, error) {
+	var tx *sql.Tx
+	var stmt *sql.Stmt
+	var err error
+
+	var updatedRecords Records
+
+	tx = ctx.Tx
+
+	stmt, err = t.PrepareInsertStatement(tx)
+
+	if err == nil {
+		records := t.Records
+
+		for _, r := range records {
+			var res sql.Result
+			var lid int64
+
+			res, err = stmt.Exec(t.InsertValues(r))
+
+			if res != nil {
+				lid, err = res.LastInsertId()
+			}
+
+			if err == nil {
+				updatedRecords = append(updatedRecords, CopyWithNewKey(r, AutoGenKey(lid)))
+			}
+		}
+	}
+
+	return t.Copy(updatedRecords), err
+}
+
+func (ctx TransactionContext) insertForeign(t ForeignTable) (ForeignTable, error) {
+	var tx *sql.Tx
+	var stmt *sql.Stmt
+	var err error
+
+	var updatedRecords Records
+
+	tx = ctx.Tx
+
+	stmt, err = t.PrepareInsertStatement(tx)
+
+	if err == nil {
+		records := t.Records
+
+		for _, r := range records {
+			_, err = stmt.Exec(t.InsertValues(r))
+		}
+	}
+
+	return t.Copy(updatedRecords), err
 }

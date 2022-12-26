@@ -385,3 +385,49 @@ func TestToUserSliceReturnsTableUserRecords(t *testing.T) {
 		t.Fatalf("ToUserSlice should have return a slice with all User records, but got: %v", bas)
 	}
 }
+
+func TestInsertFieldsReturnsPrimaryTableFieldsExceptPrimaryKey(t *testing.T) {
+	ut := NewUserTable([]User{{}})
+	expectedFields := []Field{"email"}
+
+	insertFields := ut.InsertFields()
+
+	if !reflect.DeepEqual(insertFields, expectedFields) {
+		t.Fatalf("InsertFields should have return a slice with table fields except primary key, but got: %v", insertFields)
+	}
+}
+
+func TestInsertFieldsReturnsAllForeignTableFields(t *testing.T) {
+	ut := NewHashUserTable([]User{{}})
+	expectedFields := []Field{"userid", "hsha256"}
+
+	insertFields := ut.InsertFields()
+
+	if !reflect.DeepEqual(insertFields, expectedFields) {
+		t.Fatalf("InsertFields should have return a slice with all table fields, but got: %v", insertFields)
+	}
+}
+
+func TestInsertValuesReturnsPrimaryTableValuesExceptPrimaryKeyValue(t *testing.T) {
+	r := User{UserId: 1, Email: "my.email@gmail.com"}
+	ut := NewUserTable([]User{r})
+	expectedValues := []any{r.Email}
+
+	insertValues := ut.InsertValues(r)
+
+	if !reflect.DeepEqual(insertValues, expectedValues) {
+		t.Fatalf("InsertValues should have return a slice with record values except primary key, but got: %v", insertValues)
+	}
+}
+
+func TestInsertValuesReturnsAllForeignTableValues(t *testing.T) {
+	r := User{UserId: 1, Email: "my.email@gmail.com"}
+	ut := NewHashUserTable([]User{r})
+	expectedValues := []any{r.UserId, r.Email}
+
+	insertValues := ut.InsertValues(r)
+
+	if !reflect.DeepEqual(insertValues, expectedValues) {
+		t.Fatalf("InsertValues should have return a slice with all record values, but got: %v", insertValues)
+	}
+}
