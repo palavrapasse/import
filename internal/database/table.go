@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	prepareInsertStatementSQLString               = "INSERT OR IGNORE INTO %s (%s) VALUES (%s)"
-	prepareInsertStatementPlaceholderSymbol       = "?"
-	prepareInsertStatementMultipleFieldsSeparator = ", "
+	prepareInsertStatementSQLString         = "INSERT OR IGNORE INTO %s (%s) VALUES (%s)"
+	prepareFindStatementSQLString           = "SELECT * FROM %s WHERE (%s)=(%s) LIMIT 1"
+	prepareStatementPlaceholderSymbol       = "?"
+	prepareStatementMultipleFieldsSeparator = ", "
 )
 
 const (
@@ -26,10 +27,13 @@ type Table interface {
 	Records() []Record
 	Fields() []Field
 	Copy(Records) DatabaseTable
-	InsertFields(r Record) []any
+	HasPrimaryKeySet(r Record) bool
+	InsertFields() []Field
 	InsertValues(r Record) []any
+	FindFields() []Field
+	FindValues(r Record) []any
 	PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error)
-	// PrepareQueryStatement(tx *sql.Tx) (*sql.Stmt, error)
+	PrepareFindStatement(tx *sql.Tx) (*sql.Stmt, error)
 }
 
 type DatabaseTable struct {
@@ -272,6 +276,20 @@ func (ft ForeignTable) InsertValues(r Record) []any {
 	return Values(r)
 }
 
+func (pt PrimaryTable) FindFields() []Field {
+	// todo: rely on sql tags
+	return DatabaseTable(pt).Fields()[1:]
+}
+
+func (pt PrimaryTable) FindValues(r Record) []any {
+	// todo: rely on sql tags
+	return Values(r)[1:]
+}
+
+func (pt PrimaryTable) HasPrimaryKeySet(r Record) bool {
+	return Values(r)[0] != 0
+}
+
 func (pt PrimaryTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
 	return tx.Prepare(pt.prepareInsertStatementString())
 
@@ -279,6 +297,11 @@ func (pt PrimaryTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
 
 func (ft ForeignTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
 	return tx.Prepare(ft.prepareInsertStatementString())
+}
+
+func (pt PrimaryTable) PrepareFindStatement(tx *sql.Tx) (*sql.Stmt, error) {
+	return tx.Prepare(pt.prepareFindStatementString())
+
 }
 
 func (pt PrimaryTable) Copy(rs Records) PrimaryTable {
@@ -323,13 +346,29 @@ func (ft ForeignTable) prepareInsertStatementString() string {
 	return prepareInsertStatementString(tableName, tableFields)
 }
 
-func prepareInsertStatementString(tableName string, tableFields []Field) string {
-	tablePlaceholders := stringSliceMap(func(v any) string { return prepareInsertStatementPlaceholderSymbol }, tableFields)
+func (pt PrimaryTable) prepareFindStatementString() string {
+	tableName := pt.Name()
+	tableFindFields := pt.FindFields()
 
-	tableFieldsJoin := strings.Join(toStringSlice(tableFields), prepareInsertStatementMultipleFieldsSeparator)
-	tablePlaceholdersJoin := strings.Join(toStringSlice(tablePlaceholders), prepareInsertStatementMultipleFieldsSeparator)
+	return prepareFindStatementString(tableName, tableFindFields)
+}
+
+func prepareInsertStatementString(tableName string, tableFields []Field) string {
+	tablePlaceholders := stringSliceMap(func(v any) string { return prepareStatementPlaceholderSymbol }, tableFields)
+
+	tableFieldsJoin := strings.Join(toStringSlice(tableFields), prepareStatementMultipleFieldsSeparator)
+	tablePlaceholdersJoin := strings.Join(toStringSlice(tablePlaceholders), prepareStatementMultipleFieldsSeparator)
 
 	return fmt.Sprintf(prepareInsertStatementSQLString, tableName, tableFieldsJoin, tablePlaceholdersJoin)
+}
+
+func prepareFindStatementString(tableName string, tableFields []Field) string {
+	tablePlaceholders := stringSliceMap(func(v any) string { return prepareStatementPlaceholderSymbol }, tableFields)
+
+	tableFieldsJoin := strings.Join(toStringSlice(tableFields), prepareStatementMultipleFieldsSeparator)
+	tablePlaceholdersJoin := strings.Join(toStringSlice(tablePlaceholders), prepareStatementMultipleFieldsSeparator)
+
+	return fmt.Sprintf(prepareFindStatementSQLString, tableName, tableFieldsJoin, tablePlaceholdersJoin)
 }
 
 func toStringSlice[T any](s []T) []string {
