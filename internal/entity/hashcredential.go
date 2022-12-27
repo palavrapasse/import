@@ -5,10 +5,9 @@ type HashCredentials struct {
 	HSHA256 HSHA256
 }
 
-func NewHashCredentials(credId AutoGenKey, hsha256 HSHA256) HashCredentials {
+func NewHashCredentials(cr Credentials) HashCredentials {
 	return HashCredentials{
-		CredId:  credId,
-		HSHA256: hsha256,
+		CredId:  cr.CredId,
+		HSHA256: NewHSHA256(string(cr.Password)),
 	}
-
 }
