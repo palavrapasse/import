@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -72,7 +73,28 @@ func main() {
 			var parser parser.LeakParser = parser.PlainTextLeakParser{
 				FilePath: path,
 			}
+
 			leakParse, errors := parser.Parse()
+
+			if errors != nil {
+				log.Println("Found the following errors in the file:")
+
+				for _, v := range errors {
+					log.Println(v)
+				}
+
+				log.Println("Should the import proceed?")
+				reader := bufio.NewReader(os.Stdin)
+				input, _, errRead := reader.ReadLine()
+
+				if errRead != nil {
+					return errRead
+				}
+
+				if string(input) != "y" && string(input) != "yes" {
+					return nil
+				}
+			}
 			log.Println(errors)
 			log.Println(leakParse)
 
