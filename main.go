@@ -87,6 +87,10 @@ func main() {
 				},
 			},
 		},
+		Action: func(cCtx *cli.Context) error {
+			//Without this action the help message will be shown
+			return nil
+		},
 	}
 	cli.VersionFlag = &cli.BoolFlag{
 		Name:    "version",
