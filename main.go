@@ -24,7 +24,7 @@ func main() {
 
 	var path string
 	var context string
-	var platforms string
+	var platforms []string
 	var sharedate string
 	var leakers string
 
@@ -49,19 +49,19 @@ func main() {
 			&cli.StringFlag{
 				Name:    "context",
 				Aliases: []string{"c"},
-				Usage:   "Context",
+				Usage:   "Leak Context",
 				Action: func(ctx *cli.Context, v string) error {
 					validateValue(v, "context")
 					context = v
 					return nil
 				},
 			},
-			&cli.StringFlag{
+			&cli.StringSliceFlag{
 				Name:    "platforms",
 				Aliases: []string{"p"},
-				Usage:   "Platforms",
-				Action: func(ctx *cli.Context, v string) error {
-					validateValue(v, "platforms")
+				Usage:   "Platforms affected by the leak (comma separator)",
+				Action: func(ctx *cli.Context, v []string) error {
+					validateValues(v, "platforms")
 					platforms = v
 					return nil
 				},
@@ -101,8 +101,7 @@ func main() {
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
-	err := app.Run(os.Args)
-	if err != nil {
+	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 
@@ -138,11 +137,10 @@ func main() {
 	}
 }
 
-func createPlatforms(platforms string) []entity.Platform {
-	platformsSplit := strings.Split(platforms, ",")
+func createPlatforms(platforms []string) []entity.Platform {
 	var list []entity.Platform
 
-	for _, v := range platformsSplit {
+	for _, v := range platforms {
 		platform, err := entity.NewPlatform(v)
 
 		if err != nil {
@@ -177,5 +175,11 @@ func createBadActors(leakers string) []entity.BadActor {
 func validateValue(value string, flag string) {
 	if strings.TrimSpace(value) == "" {
 		log.Fatal(flag + " should not be empty or white spaces")
+	}
+}
+
+func validateValues(value []string, flag string) {
+	if len(value) == 0 {
+		log.Fatal(flag + " should not be empty")
 	}
 }
