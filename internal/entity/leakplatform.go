@@ -5,9 +5,9 @@ type LeakPlatform struct {
 	LeakId AutoGenKey
 }
 
-func NewLeakPlatform(platId AutoGenKey, leakId AutoGenKey) LeakPlatform {
+func NewLeakPlatform(plat Platform, leak Leak) LeakPlatform {
 	return LeakPlatform{
-		PlatId: platId,
-		LeakId: leakId,
+		PlatId: plat.PlatId,
+		LeakId: leak.LeakId,
 	}
 }
