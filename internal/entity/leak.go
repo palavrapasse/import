@@ -21,7 +21,8 @@ func NewLeak(context string, shareDateSC DateInSeconds) (Leak, error) {
 
 	if err == nil {
 		l = Leak{
-			Context: Context(contextTrim),
+			Context:     Context(contextTrim),
+			ShareDateSC: shareDateSC,
 		}
 	}
 
