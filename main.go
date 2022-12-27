@@ -26,7 +26,7 @@ func main() {
 	var context string
 	var platforms []string
 	var sharedate string
-	var leakers string
+	var leakers []string
 
 	app := &cli.App{
 		Name:                 "import",
@@ -76,12 +76,12 @@ func main() {
 					return nil
 				},
 			},
-			&cli.StringFlag{
+			&cli.StringSliceFlag{
 				Name:    "leakers",
 				Aliases: []string{"l"},
-				Usage:   "Leakers",
-				Action: func(ctx *cli.Context, v string) error {
-					validateValue(v, "leakers")
+				Usage:   "Leakers (comma separator)",
+				Action: func(ctx *cli.Context, v []string) error {
+					validateValues(v, "leakers")
 					leakers = v
 					return nil
 				},
@@ -154,11 +154,10 @@ func createPlatforms(platforms []string) []entity.Platform {
 	return list
 }
 
-func createBadActors(leakers string) []entity.BadActor {
-	leakersSplit := strings.Split(leakers, ",")
+func createBadActors(leakers []string) []entity.BadActor {
 	var list []entity.BadActor
 
-	for _, v := range leakersSplit {
+	for _, v := range leakers {
 		badActor, err := entity.NewBadActor(v)
 
 		if err != nil {
