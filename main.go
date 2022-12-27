@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/palavrapasse/import/internal/entity"
 	"github.com/palavrapasse/import/internal/parser"
 	"github.com/urfave/cli/v2"
 )
@@ -115,7 +116,58 @@ func main() {
 		log.Println(errors)
 		log.Println(leakParse)
 
+		sharedatesc, err := entity.NewDateInSeconds(sharedate)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(sharedatesc)
+
+		leak, err := entity.NewLeak(context, sharedatesc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println(leak)
+
+		createPlatforms(platforms)
+
+		createBadActors(leakers)
 	}
+}
+
+func createPlatforms(platforms string) []entity.Platform {
+	platformsSplit := strings.Split(platforms, ",")
+	var list []entity.Platform
+
+	for _, v := range platformsSplit {
+		platform, err := entity.NewPlatform(v)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		list = append(list, platform)
+		log.Println(platform)
+	}
+
+	return list
+}
+
+func createBadActors(leakers string) []entity.BadActor {
+	leakersSplit := strings.Split(leakers, ",")
+	var list []entity.BadActor
+
+	for _, v := range leakersSplit {
+		badActor, err := entity.NewBadActor(v)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		list = append(list, badActor)
+		log.Println(badActor)
+	}
+
+	return list
 }
 
 func validateValue(value string, flag string) {
