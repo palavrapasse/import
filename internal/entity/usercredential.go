@@ -5,9 +5,9 @@ type UserCredentials struct {
 	UserId AutoGenKey
 }
 
-func NewUserCredentials(credId AutoGenKey, userId AutoGenKey) UserCredentials {
+func NewUserCredentials(cred Credentials, user User) UserCredentials {
 	return UserCredentials{
-		CredId: credId,
-		UserId: userId,
+		CredId: cred.CredId,
+		UserId: user.UserId,
 	}
 }
