@@ -5,9 +5,9 @@ type LeakUser struct {
 	LeakId AutoGenKey
 }
 
-func NewLeakUser(userId AutoGenKey, leakId AutoGenKey) LeakUser {
+func NewLeakUser(user User, leak Leak) LeakUser {
 	return LeakUser{
-		UserId: userId,
-		LeakId: leakId,
+		UserId: user.UserId,
+		LeakId: leak.LeakId,
 	}
 }

@@ -5,9 +5,9 @@ type LeakCredentials struct {
 	LeakId AutoGenKey
 }
 
-func NewLeakCredentials(credId AutoGenKey, leakId AutoGenKey) LeakCredentials {
+func NewLeakCredentials(cred Credentials, leak Leak) LeakCredentials {
 	return LeakCredentials{
-		CredId: credId,
-		LeakId: leakId,
+		CredId: cred.CredId,
+		LeakId: leak.LeakId,
 	}
 }
