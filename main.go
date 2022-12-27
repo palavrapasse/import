@@ -35,7 +35,7 @@ func main() {
 		EnableBashCompletion: true,
 		Commands:             []*cli.Command{},
 		Flags: []cli.Flag{
-			&cli.StringFlag{
+			&cli.PathFlag{
 				Name:     "leak-path",
 				Aliases:  []string{"lp"},
 				Usage:    "Load leak from `FILE`",
