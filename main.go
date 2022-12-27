@@ -48,9 +48,10 @@ func main() {
 				},
 			},
 			&cli.StringFlag{
-				Name:    "context",
-				Aliases: []string{"c"},
-				Usage:   "Leak Context",
+				Name:     "context",
+				Aliases:  []string{"c"},
+				Usage:    "Leak Context",
+				Required: true,
 				Action: func(ctx *cli.Context, v string) error {
 					validateValue(v, "context")
 					context = v
@@ -58,9 +59,10 @@ func main() {
 				},
 			},
 			&cli.StringSliceFlag{
-				Name:    "platforms",
-				Aliases: []string{"p"},
-				Usage:   "Platforms affected by the leak (comma separator)",
+				Name:     "platforms",
+				Aliases:  []string{"p"},
+				Usage:    "Platforms affected by the leak (comma separator)",
+				Required: true,
 				Action: func(ctx *cli.Context, v []string) error {
 					validateValues(v, "platforms")
 					platforms = v
@@ -68,19 +70,21 @@ func main() {
 				},
 			},
 			&cli.TimestampFlag{
-				Name:    "share-date",
-				Aliases: []string{"sd"},
-				Usage:   "Leak Share Date",
-				Layout:  entity.DateFormatLayout,
+				Name:     "share-date",
+				Aliases:  []string{"sd"},
+				Usage:    "Leak Share Date",
+				Layout:   entity.DateFormatLayout,
+				Required: true,
 				Action: func(ctx *cli.Context, v *time.Time) error {
 					sharedate = v.Format(entity.DateFormatLayout)
 					return nil
 				},
 			},
 			&cli.StringSliceFlag{
-				Name:    "leakers",
-				Aliases: []string{"l"},
-				Usage:   "Leakers (comma separator)",
+				Name:     "leakers",
+				Aliases:  []string{"l"},
+				Usage:    "Leakers (comma separator)",
+				Required: true,
 				Action: func(ctx *cli.Context, v []string) error {
 					validateValues(v, "leakers")
 					leakers = v
