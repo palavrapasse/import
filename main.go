@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/palavrapasse/import/internal/entity"
 	"github.com/palavrapasse/import/internal/parser"
@@ -66,13 +67,13 @@ func main() {
 					return nil
 				},
 			},
-			&cli.StringFlag{
+			&cli.TimestampFlag{
 				Name:    "share-date",
 				Aliases: []string{"sd"},
-				Usage:   "Share Date",
-				Action: func(ctx *cli.Context, v string) error {
-					validateValue(v, "share-date")
-					sharedate = v
+				Usage:   "Leak Share Date",
+				Layout:  entity.DateFormatLayout,
+				Action: func(ctx *cli.Context, v *time.Time) error {
+					sharedate = v.Format(entity.DateFormatLayout)
 					return nil
 				},
 			},
@@ -123,7 +124,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(sharedatesc)
+		log.Printf("sharedatesc -> %v\n", sharedatesc)
 
 		leak, err := entity.NewLeak(context, sharedatesc)
 		if err != nil {
