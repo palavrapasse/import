@@ -25,6 +25,7 @@ func main() {
 	var context string
 	var platforms string
 	var sharedate string
+	var leakers string
 
 	app := &cli.App{
 		Name:                 "import",
@@ -74,6 +75,16 @@ func main() {
 					return nil
 				},
 			},
+			&cli.StringFlag{
+				Name:    "leakers",
+				Aliases: []string{"l"},
+				Usage:   "Leakers",
+				Action: func(ctx *cli.Context, v string) error {
+					validateValue(v, "leakers")
+					leakers = v
+					return nil
+				},
+			},
 		},
 	}
 	cli.VersionFlag = &cli.BoolFlag{
@@ -95,6 +106,7 @@ func main() {
 		log.Println(context)
 		log.Println(platforms)
 		log.Println(sharedate)
+		log.Println(leakers)
 
 		var parser parser.LeakParser = parser.PlainTextLeakParser{
 			FilePath: path,
