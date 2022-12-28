@@ -21,14 +21,25 @@ const (
 	FlagLeakers       = "leakers"
 )
 
+const (
+	ProceedShortAnswer = "y"
+	ProceedLongAnswer  = "yes"
+)
+
 func main() {
 
 	app := &cli.App{
 		Name:                 "import",
 		Version:              "v0.0.1",
 		Usage:                "Imports leak files into SQLite",
+		Copyright:            "(c) 2022 palavrapasse",
+		Suggest:              true,
 		EnableBashCompletion: true,
-		Commands:             []*cli.Command{},
+		Authors: []*cli.Author{
+			{Name: "João Freitas"},
+			{Name: "Rute Santos"},
+		},
+		Commands: []*cli.Command{},
 		Flags: []cli.Flag{
 			&cli.PathFlag{
 				Name:     FlagLeakPath,
@@ -92,7 +103,7 @@ func main() {
 					return errRead
 				}
 
-				if string(input) != "y" && string(input) != "yes" {
+				if string(input) != ProceedShortAnswer && string(input) != ProceedLongAnswer {
 					return nil
 				}
 			}
