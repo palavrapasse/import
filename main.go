@@ -28,6 +28,9 @@ const (
 
 func main() {
 
+	exampleCommand := fmt.Sprintf(`--leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
+		entity.DateFormatLayout)
+
 	app := &cli.App{
 		Name:                 "import",
 		Version:              "v0.0.1",
@@ -164,6 +167,14 @@ func main() {
 		Aliases: []string{"v"},
 		Usage:   "current version",
 	}
+
+	// Append to an existing template
+	cli.AppHelpTemplate = fmt.Sprintf(`%s
+EXAMPLE: %s
+
+WEBSITE: https://github.com/palavrapasse
+
+`, cli.AppHelpTemplate, exampleCommand)
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
