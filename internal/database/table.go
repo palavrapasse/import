@@ -10,7 +10,7 @@ import (
 
 const (
 	prepareInsertStatementSQLString         = "INSERT OR IGNORE INTO %s (%s) VALUES (%s)"
-	prepareFindStatementSQLString           = "SELECT * FROM %s WHERE (%s)=(%s) LIMIT 1"
+	prepareFindStatementSQLString           = "SELECT * FROM %s WHERE (%s) = (%s) LIMIT 1"
 	prepareStatementPlaceholderSymbol       = "?"
 	prepareStatementMultipleFieldsSeparator = ", "
 )
@@ -20,20 +20,20 @@ const (
 )
 
 var unknownTableFields = []Field{}
-var unknownRecordValues = []any{}
 
 type Table interface {
 	Name() string
 	Records() []Record
 	Fields() []Field
+	Values(Record) []any
 	Copy(Records) DatabaseTable
-	HasPrimaryKeySet(r Record) bool
+	HasPrimaryKeySet(Record) bool
 	InsertFields() []Field
-	InsertValues(r Record) []any
+	InsertValues(Record) []any
 	FindFields() []Field
-	FindValues(r Record) []any
-	PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error)
-	PrepareFindStatement(tx *sql.Tx) (*sql.Stmt, error)
+	FindValues(Record) []any
+	PrepareInsertStatement(*sql.Tx) (*sql.Stmt, error)
+	PrepareFindStatement(*sql.Tx) (*sql.Stmt, error)
 }
 
 type DatabaseTable struct {
@@ -260,6 +260,10 @@ func (ft ForeignTable) Fields() []Field {
 	return DatabaseTable(ft).Fields()
 }
 
+func (pt PrimaryTable) Values(r Record) []any {
+	return Values(r)
+}
+
 func (pt PrimaryTable) InsertFields() []Field {
 	return DatabaseTable(pt).Fields()[1:]
 }
@@ -287,7 +291,8 @@ func (pt PrimaryTable) FindValues(r Record) []any {
 }
 
 func (pt PrimaryTable) HasPrimaryKeySet(r Record) bool {
-	return Values(r)[0] != 0
+	// todo: rely on sql tags
+	return Values(r)[0] != AutoGenKey(0)
 }
 
 func (pt PrimaryTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {

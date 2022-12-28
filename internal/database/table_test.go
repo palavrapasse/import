@@ -159,150 +159,6 @@ func TestTableFieldsReturnsUnknownTableIfItDoesNotContainAnyRecord(t *testing.T)
 	}
 }
 
-func TestBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewBadActorTable([]BadActor{{}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO BadActor (identifier) VALUES (?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewCredentialsTable([]Credentials{{}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO Credentials (password) VALUES (?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestHashCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewHashCredentialsTable([]Credentials{{}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO HashCredentials (credid, hsha256) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestHashUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewHashUserTable([]User{{}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO HashUser (userid, hsha256) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestLeakBadActorTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewLeakBadActorTable(map[Leak][]BadActor{{}: {BadActor{}}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO LeakBadActor (baid, leakid) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestLeakCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewLeakCredentialsTable(map[Leak][]Credentials{{}: {Credentials{}}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO LeakCredentials (credid, leakid) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestLeakPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewLeakPlatformTable(map[Leak][]Platform{{}: {Platform{}}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO LeakPlatform (platid, leakid) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestLeakTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewLeakTable(Leak{})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO Leak (sharedatesc, context) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestLeakUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewLeakUserTable(map[Leak][]User{{}: {User{}}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO LeakUser (userid, leakid) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestPlatformTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewPlatformTable([]Platform{{}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO Platform (name) VALUES (?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestUserCredentialsTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewUserCredentialsTable(map[User]Credentials{{}: {}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO UserCredentials (credid, userid) VALUES (?, ?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
-func TestUserTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
-	tb := NewUserTable([]User{{}})
-
-	expectedInsertStatement := "INSERT OR IGNORE INTO User (email) VALUES (?)"
-
-	insertStatement := tb.prepareInsertStatementString()
-
-	if insertStatement != expectedInsertStatement {
-		t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", insertStatement)
-	}
-}
-
 func TestPrimaryTableCopyReturnsDatabaseTableWithNewRecords(t *testing.T) {
 	oldRecords := Records{User{UserId: 1}}
 	newRecords := Records{User{UserId: 2}}
@@ -429,5 +285,134 @@ func TestInsertValuesReturnsAllForeignTableValues(t *testing.T) {
 
 	if !reflect.DeepEqual(insertValues, expectedValues) {
 		t.Fatalf("InsertValues should have return a slice with all record values, but got: %v", insertValues)
+	}
+}
+
+func TestTablePrepareInsertStatementReturnsSchemaInsertStatement(t *testing.T) {
+	bat := NewBadActorTable([]BadActor{{}}).prepareInsertStatementString()
+	crt := NewCredentialsTable([]Credentials{{}}).prepareInsertStatementString()
+	hct := NewHashCredentialsTable([]Credentials{{}}).prepareInsertStatementString()
+	hut := NewHashUserTable([]User{{}}).prepareInsertStatementString()
+	lbat := NewLeakBadActorTable(map[Leak][]BadActor{{}: {BadActor{}}}).prepareInsertStatementString()
+	lct := NewLeakCredentialsTable(map[Leak][]Credentials{{}: {Credentials{}}}).prepareInsertStatementString()
+	lpt := NewLeakPlatformTable(map[Leak][]Platform{{}: {Platform{}}}).prepareInsertStatementString()
+	lt := NewLeakTable(Leak{}).prepareInsertStatementString()
+	lut := NewLeakUserTable(map[Leak][]User{{}: {User{}}}).prepareInsertStatementString()
+	pt := NewPlatformTable([]Platform{{}}).prepareInsertStatementString()
+	uct := NewUserCredentialsTable(map[User]Credentials{{}: {}}).prepareInsertStatementString()
+	ut := NewUserTable([]User{{}}).prepareInsertStatementString()
+
+	tableInsertSchemaMapping := map[string]string{
+		bat:  "INSERT OR IGNORE INTO BadActor (identifier) VALUES (?)",
+		crt:  "INSERT OR IGNORE INTO Credentials (password) VALUES (?)",
+		hct:  "INSERT OR IGNORE INTO HashCredentials (credid, hsha256) VALUES (?, ?)",
+		hut:  "INSERT OR IGNORE INTO HashUser (userid, hsha256) VALUES (?, ?)",
+		lbat: "INSERT OR IGNORE INTO LeakBadActor (baid, leakid) VALUES (?, ?)",
+		lct:  "INSERT OR IGNORE INTO LeakCredentials (credid, leakid) VALUES (?, ?)",
+		lpt:  "INSERT OR IGNORE INTO LeakPlatform (platid, leakid) VALUES (?, ?)",
+		lt:   "INSERT OR IGNORE INTO Leak (sharedatesc, context) VALUES (?, ?)",
+		lut:  "INSERT OR IGNORE INTO LeakUser (userid, leakid) VALUES (?, ?)",
+		pt:   "INSERT OR IGNORE INTO Platform (name) VALUES (?)",
+		uct:  "INSERT OR IGNORE INTO UserCredentials (credid, userid) VALUES (?, ?)",
+		ut:   "INSERT OR IGNORE INTO User (email) VALUES (?)",
+	}
+
+	for ts, s := range tableInsertSchemaMapping {
+		expectedSchema := s
+		statement := ts
+
+		if statement != expectedSchema {
+			t.Fatalf("Prepared insert statement should be the same as defined in the schema, but got: %v", statement)
+		}
+	}
+}
+
+func TestTablePrepareInsertStatementReturnsSchemaFindStatement(t *testing.T) {
+	bat := NewBadActorTable([]BadActor{{}}).prepareFindStatementString()
+	crt := NewCredentialsTable([]Credentials{{}}).prepareFindStatementString()
+	lt := NewLeakTable(Leak{}).prepareFindStatementString()
+	pt := NewPlatformTable([]Platform{{}}).prepareFindStatementString()
+	ut := NewUserTable([]User{{}}).prepareFindStatementString()
+
+	tableFindSchemaMapping := map[string]string{
+		bat: "SELECT * FROM BadActor WHERE (identifier) = (?) LIMIT 1",
+		crt: "SELECT * FROM Credentials WHERE (password) = (?) LIMIT 1",
+		lt:  "SELECT * FROM Leak WHERE (sharedatesc, context) = (?, ?) LIMIT 1",
+		pt:  "SELECT * FROM Platform WHERE (name) = (?) LIMIT 1",
+		ut:  "SELECT * FROM User WHERE (email) = (?) LIMIT 1",
+	}
+
+	for ts, s := range tableFindSchemaMapping {
+		expectedSchema := s
+		statement := ts
+
+		if statement != expectedSchema {
+			t.Fatalf("Prepared find statement should be the same as defined in the schema, but got: %v", statement)
+		}
+	}
+}
+
+func TestPrimaryTableHasPrimaryKeySetReturnsTrueIfAutoGenKeyValueIsDifferentThanZero(t *testing.T) {
+	r := User{UserId: 1}
+	tb := NewUserTable([]User{r})
+
+	expectedVerification := true
+
+	hasPrimaryKeySet := tb.HasPrimaryKeySet(r)
+
+	if hasPrimaryKeySet != expectedVerification {
+		t.Fatalf("Record has its primary key with a value greater than 0, but HasPrimaryKey returned: %v", hasPrimaryKeySet)
+	}
+}
+
+func TestPrimaryTableHasPrimaryKeySetReturnsFalseIfAutoGenKeyValueIsEqualToZero(t *testing.T) {
+	r := User{UserId: 1}
+	tb := NewUserTable([]User{r})
+
+	expectedVerification := true
+
+	hasPrimaryKeySet := tb.HasPrimaryKeySet(r)
+
+	if hasPrimaryKeySet != expectedVerification {
+		t.Fatalf("Record has its primary key with a value greater than 0, but HasPrimaryKey returned: %v", hasPrimaryKeySet)
+	}
+}
+
+func TestPrimaryTableValuesReturnsAllRecordValues(t *testing.T) {
+	r := User{UserId: 1, Email: "my.email@gmail.com"}
+	tb := NewUserTable([]User{r})
+
+	expectedValues := []any{r.UserId, r.Email}
+
+	values := tb.Values(r)
+
+	if !reflect.DeepEqual(values, expectedValues) {
+		t.Fatalf("Values should have returned all values, but got: %v", values...)
+	}
+}
+
+func TestPrimaryTableFindValuesReturnsAllRecordValuesExceptPrimaryKey(t *testing.T) {
+	r := User{UserId: 1, Email: "my.email@gmail.com"}
+	tb := NewUserTable([]User{r})
+
+	expectedValues := []any{r.Email}
+
+	findValues := tb.FindValues(r)
+
+	if !reflect.DeepEqual(findValues, expectedValues) {
+		t.Fatalf("FindValues should have returned all values except primary key, but got: %v", findValues...)
+	}
+}
+
+func TestPrimaryTableFieldsReturnsAllTableFieldsNames(t *testing.T) {
+	r := User{UserId: 1, Email: "my.email@gmail.com"}
+	tb := NewUserTable([]User{r})
+
+	expectedFields := []Field{"userid", "email"}
+
+	fields := tb.Fields()
+
+	if !reflect.DeepEqual(fields, expectedFields) {
+		t.Fatalf("Fields should have returned all field names, but got: %v", fields)
 	}
 }

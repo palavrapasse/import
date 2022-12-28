@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"reflect"
 
 	_ "github.com/mattn/go-sqlite3"
 	. "github.com/palavrapasse/import/internal/entity"
@@ -157,15 +158,29 @@ func (ctx TransactionContext) findPrimary(t PrimaryTable) (PrimaryTable, error) 
 			if !t.HasPrimaryKeySet(r) {
 				var row *sql.Row
 				var rid int64
+				var rvp []*any
+				var rvpp []any
+
+				rv := t.Values(r)
+
+				for _, v := range rv {
+					var x = reflect.ValueOf(v).Interface()
+					rvp = append(rvp, &x)
+					rvpp = append(rvpp, &x)
+				}
 
 				row = stmt.QueryRow(t.FindValues(r)...)
 
 				if row != nil {
-					err = row.Scan(&rid)
+					err = row.Scan(rvpp...)
 				}
 
 				if err == nil {
+					rid = (*rvp[0]).(int64)
+
 					updatedRecords = append(updatedRecords, CopyWithNewKey(r, AutoGenKey(rid)))
+				} else {
+					break
 				}
 			} else {
 				updatedRecords = append(updatedRecords, r)
@@ -192,16 +207,23 @@ func (ctx TransactionContext) insertPrimary(t PrimaryTable) (PrimaryTable, error
 
 		for _, r := range records {
 			var res sql.Result
+			var raff int64
 			var lid int64
 
 			res, err = stmt.Exec(t.InsertValues(r)...)
 
 			if res != nil {
+				raff, err = res.RowsAffected()
+			}
+
+			if raff > 0 {
 				lid, err = res.LastInsertId()
 			}
 
 			if err == nil {
 				updatedRecords = append(updatedRecords, CopyWithNewKey(r, AutoGenKey(lid)))
+			} else {
+				break
 			}
 		}
 	}
@@ -225,6 +247,10 @@ func (ctx TransactionContext) insertForeign(t ForeignTable) (ForeignTable, error
 
 		for _, r := range records {
 			_, err = stmt.Exec(t.InsertValues(r)...)
+
+			if err != nil {
+				break
+			}
 		}
 	}
 
