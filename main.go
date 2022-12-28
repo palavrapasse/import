@@ -46,7 +46,8 @@ func main() {
 				Name:     FlagLeakPlatforms,
 				Aliases:  []string{"p"},
 				Usage:    "Platforms affected by the leak (comma separator)",
-				Required: true,
+				Value:    cli.NewStringSlice("default"),
+				Required: false,
 			},
 			&cli.TimestampFlag{
 				Name:     FlagLeakShareDate,
@@ -83,7 +84,7 @@ func main() {
 					log.Println(v)
 				}
 
-				log.Println("Should the import proceed?")
+				log.Println("Should the import be proceeded?")
 				reader := bufio.NewReader(os.Stdin)
 				input, _, errRead := reader.ReadLine()
 
