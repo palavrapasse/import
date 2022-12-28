@@ -28,7 +28,7 @@ const (
 
 func main() {
 
-	exampleCommand := fmt.Sprintf(`--leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
+	exampleCommand := fmt.Sprintf(`./import --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
 		entity.DateFormatLayout)
 
 	app := &cli.App{
@@ -38,6 +38,8 @@ func main() {
 		Copyright:            "(c) 2022 palavrapasse",
 		Suggest:              true,
 		EnableBashCompletion: true,
+		HideHelp:             false,
+		HideVersion:          false,
 		Authors: []*cli.Author{
 			{Name: "João Freitas"},
 			{Name: "Rute Santos"},
@@ -162,17 +164,13 @@ func main() {
 		},
 	}
 
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:    "version",
-		Aliases: []string{"v"},
-		Usage:   "current version",
-	}
-
 	// Append to an existing template
 	cli.AppHelpTemplate = fmt.Sprintf(`%s
-EXAMPLE: %s
+EXAMPLE: 
+	%s
 
-WEBSITE: https://github.com/palavrapasse
+WEBSITE:
+	https://github.com/palavrapasse
 
 `, cli.AppHelpTemplate, exampleCommand)
 
