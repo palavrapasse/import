@@ -23,13 +23,6 @@ const (
 	flagLeakers       = "leakers"
 )
 
-var aliasesFlagDatabasePath = []string{"db"}
-var aliasesFlagLeakPath = []string{"lp"}
-var aliasesFlagLeakContext = []string{"c"}
-var aliasesFlagLeakPlatforms = []string{"p"}
-var aliasesFlagLeakShareDate = []string{"sd"}
-var aliasesFlagLeakers = []string{"l"}
-
 const (
 	proceedShortAnswer = "y"
 	proceedLongAnswer  = "yes"
@@ -168,28 +161,28 @@ func createCliFlags(databasePath *string, leakPath *string, context *string, pla
 	return []cli.Flag{
 		&cli.PathFlag{
 			Name:        flagDatabasePath,
-			Aliases:     aliasesFlagDatabasePath,
+			Aliases:     AliasesFlagDatabasePath,
 			Usage:       "Store leaks into `SQLite Database`",
 			Required:    true,
 			Destination: databasePath,
 		},
 		&cli.PathFlag{
 			Name:        flagLeakPath,
-			Aliases:     aliasesFlagLeakPath,
+			Aliases:     AliasesFlagLeakPath,
 			Usage:       "Load leak from `FILE`",
 			Required:    true,
 			Destination: leakPath,
 		},
 		&cli.StringFlag{
 			Name:        flagLeakContext,
-			Aliases:     aliasesFlagLeakContext,
+			Aliases:     AliasesFlagLeakContext,
 			Usage:       "Leak Context",
 			Required:    true,
 			Destination: context,
 		},
 		&cli.StringSliceFlag{
 			Name:        flagLeakPlatforms,
-			Aliases:     aliasesFlagLeakPlatforms,
+			Aliases:     AliasesFlagLeakPlatforms,
 			Usage:       "Platforms affected by the leak (separated by commas)",
 			Value:       cli.NewStringSlice("default"),
 			Required:    false,
@@ -197,7 +190,7 @@ func createCliFlags(databasePath *string, leakPath *string, context *string, pla
 		},
 		&cli.TimestampFlag{
 			Name:        flagLeakShareDate,
-			Aliases:     aliasesFlagLeakShareDate,
+			Aliases:     AliasesFlagLeakShareDate,
 			Usage:       "Leak Share Date",
 			Layout:      entity.DateFormatLayout,
 			Required:    true,
@@ -205,7 +198,7 @@ func createCliFlags(databasePath *string, leakPath *string, context *string, pla
 		},
 		&cli.StringSliceFlag{
 			Name:        flagLeakers,
-			Aliases:     aliasesFlagLeakers,
+			Aliases:     AliasesFlagLeakers,
 			Usage:       "Leakers (separated by commas)",
 			Required:    true,
 			Destination: leakers,
