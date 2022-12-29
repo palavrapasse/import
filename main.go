@@ -32,6 +32,7 @@ const (
 	DBFilePath = "../fandom/database2.sqlite"
 )
 
+var ProceedAnswers = []string{ProceedShortAnswer, ProceedLongAnswer}
 var ExampleCommand = fmt.Sprintf(`./import --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
 	entity.DateFormatLayout)
 
@@ -83,7 +84,7 @@ func main() {
 					return errRead
 				}
 
-				if string(input) != ProceedShortAnswer && string(input) != ProceedLongAnswer {
+				if contains(ProceedAnswers, strings.ToLower(string(input))) {
 					return nil
 				}
 			}
@@ -286,4 +287,15 @@ func validateFlagValues(value []string, flag string) error {
 	}
 
 	return nil
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+
+		if a == e {
+			return true
+		}
+	}
+
+	return false
 }
