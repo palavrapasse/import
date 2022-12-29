@@ -41,7 +41,7 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 		EnableBashCompletion: true,
 		HideHelp:             false,
 		HideVersion:          false,
-		Authors:              createCliAuthors(),
+		Authors:              CreateCliAuthors(),
 		Commands:             []*cli.Command{},
 		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers),
 		Action: func(cCtx *cli.Context) error {
@@ -137,14 +137,6 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	return *app
-}
-
-func createCliAuthors() []*cli.Author {
-
-	return []*cli.Author{
-		{Name: "João Freitas"},
-		{Name: "Rute Santos"},
-	}
 }
 
 func createAppHelpTemplate(base string) string {
