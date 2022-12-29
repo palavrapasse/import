@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/palavrapasse/import/internal/database"
 	"github.com/palavrapasse/import/internal/entity"
 	"github.com/palavrapasse/import/internal/parser"
 	"github.com/urfave/cli/v2"
@@ -26,10 +27,20 @@ const (
 	ProceedLongAnswer  = "yes"
 )
 
+const (
+	DBFilePath = "../fandom/database2.sqlite"
+)
+
 func main() {
 
 	exampleCommand := fmt.Sprintf(`./import --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
 		entity.DateFormatLayout)
+
+	var leakPath string
+	var context string
+	var platforms cli.StringSlice
+	var shareDate cli.Timestamp
+	var leakers cli.StringSlice
 
 	app := &cli.App{
 		Name:                 "import",
@@ -47,48 +58,52 @@ func main() {
 		Commands: []*cli.Command{},
 		Flags: []cli.Flag{
 			&cli.PathFlag{
-				Name:     FlagLeakPath,
-				Aliases:  []string{"lp"},
-				Usage:    "Load leak from `FILE`",
-				Required: true,
+				Name:        FlagLeakPath,
+				Aliases:     []string{"lp"},
+				Usage:       "Load leak from `FILE`",
+				Required:    true,
+				Destination: &leakPath,
 			},
 			&cli.StringFlag{
-				Name:     FlagLeakContext,
-				Aliases:  []string{"c"},
-				Usage:    "Leak Context",
-				Required: true,
+				Name:        FlagLeakContext,
+				Aliases:     []string{"c"},
+				Usage:       "Leak Context",
+				Required:    true,
+				Destination: &context,
 			},
 			&cli.StringSliceFlag{
-				Name:     FlagLeakPlatforms,
-				Aliases:  []string{"p"},
-				Usage:    "Platforms affected by the leak (comma separator)",
-				Value:    cli.NewStringSlice("default"),
-				Required: false,
+				Name:        FlagLeakPlatforms,
+				Aliases:     []string{"p"},
+				Usage:       "Platforms affected by the leak (comma separator)",
+				Value:       cli.NewStringSlice("default"),
+				Required:    false,
+				Destination: &platforms,
 			},
 			&cli.TimestampFlag{
-				Name:     FlagLeakShareDate,
-				Aliases:  []string{"sd"},
-				Usage:    "Leak Share Date",
-				Layout:   entity.DateFormatLayout,
-				Required: true,
+				Name:        FlagLeakShareDate,
+				Aliases:     []string{"sd"},
+				Usage:       "Leak Share Date",
+				Layout:      entity.DateFormatLayout,
+				Required:    true,
+				Destination: &shareDate,
 			},
 			&cli.StringSliceFlag{
-				Name:     FlagLeakers,
-				Aliases:  []string{"l"},
-				Usage:    "Leakers (comma separator)",
-				Required: true,
+				Name:        FlagLeakers,
+				Aliases:     []string{"l"},
+				Usage:       "Leakers (comma separator)",
+				Required:    true,
+				Destination: &leakers,
 			},
 		},
 		Action: func(cCtx *cli.Context) error {
-			path := cCtx.String(FlagLeakPath)
-			err := validateValue(path, FlagLeakPath)
+			err := validateValue(leakPath, FlagLeakPath)
 
 			if err != nil {
 				return err
 			}
 
 			var parser parser.LeakParser = parser.PlainTextLeakParser{
-				FilePath: path,
+				FilePath: leakPath,
 			}
 
 			leakParse, errors := parser.Parse()
@@ -112,27 +127,24 @@ func main() {
 					return nil
 				}
 			}
-			log.Println(errors)
-			log.Println(leakParse)
 
-			platforms := cCtx.StringSlice(FlagLeakPlatforms)
-			err = validateValues(platforms, FlagLeakPlatforms)
+			platformsSlice := platforms.Value()
+			err = validateSlice(platformsSlice, FlagLeakPlatforms)
 
 			if err != nil {
 				return err
 			}
 
-			leakers := cCtx.StringSlice(FlagLeakers)
-			err = validateValues(leakers, FlagLeakers)
+			leakersSlice := leakers.Value()
+			err = validateSlice(leakersSlice, FlagLeakers)
 
 			if err != nil {
 				return err
 			}
 
-			context := cCtx.String(FlagLeakContext)
-			sharedate := cCtx.Timestamp(FlagLeakShareDate).Format(entity.DateFormatLayout)
+			shareDateFormat := shareDate.Value().Format(entity.DateFormatLayout)
 
-			sharedatesc, err := entity.NewDateInSeconds(sharedate)
+			sharedatesc, err := entity.NewDateInSeconds(shareDateFormat)
 
 			if err != nil {
 				return err
@@ -144,21 +156,30 @@ func main() {
 				return err
 			}
 
-			leakPlatforms, err := createPlatforms(platforms)
+			leakPlatforms, err := createPlatforms(platformsSlice)
 
 			if err != nil {
 				return err
 			}
 
-			leakBadActors, err := createBadActors(leakers)
+			leakBadActors, err := createBadActors(leakersSlice)
 
 			if err != nil {
 				return err
 			}
 
-			log.Println(leak)
-			log.Println(leakPlatforms)
-			log.Println(leakBadActors)
+			i := entity.Import{
+				Leak:              leak,
+				AffectedUsers:     leakParse,
+				AffectedPlatforms: leakPlatforms,
+				Leakers:           leakBadActors,
+			}
+
+			err = storeImport(i)
+
+			if err != nil {
+				return err
+			}
 
 			return nil
 		},
@@ -180,6 +201,27 @@ WEBSITE:
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func storeImport(i entity.Import) error {
+	dbctx, err := database.NewDatabaseContext(DBFilePath)
+
+	if dbctx.DB != nil {
+		defer dbctx.DB.Close()
+	}
+
+	if err != nil {
+		return fmt.Errorf("error while creating DB context")
+	}
+
+	err = dbctx.Insert(i)
+
+	if err != nil {
+		return fmt.Errorf("error while storing data in DB %v", err)
+	}
+
+	log.Println("Successful Import")
+	return nil
 }
 
 func createPlatforms(platforms []string) ([]entity.Platform, error) {
@@ -222,7 +264,7 @@ func validateValue(value string, flag string) error {
 	return nil
 }
 
-func validateValues(value []string, flag string) error {
+func validateSlice(value []string, flag string) error {
 	if len(value) == 0 {
 		return fmt.Errorf("%s should not be empty", flag)
 	}
