@@ -14,15 +14,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-const (
-	proceedShortAnswer = "y"
-	proceedLongAnswer  = "yes"
-)
-
-var proceedAnswers = []string{proceedShortAnswer, proceedLongAnswer}
-var exampleCommand = fmt.Sprintf(`./import --database-path="path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
-	entity.DateFormatLayout)
-
 func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) cli.App {
 
 	var databasePath string
@@ -42,7 +33,6 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 		HideHelp:             false,
 		HideVersion:          false,
 		Authors:              CreateCliAuthors(),
-		Commands:             []*cli.Command{},
 		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers),
 		Action: func(cCtx *cli.Context) error {
 
@@ -79,7 +69,7 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 					return errRead
 				}
 
-				if !contains(proceedAnswers, strings.ToLower(string(input))) {
+				if !IsProceedAnswer(proceedAnswers, strings.ToLower(string(input))) {
 					return nil
 				}
 			}
@@ -185,17 +175,6 @@ func validateFlagValues(value []string, flag string) error {
 	}
 
 	return nil
-}
-
-func contains(s []string, e string) bool {
-	for _, a := range s {
-
-		if a == e {
-			return true
-		}
-	}
-
-	return false
 }
 
 func appendValidError(errors []error, err error) []error {

@@ -1,10 +1,16 @@
 package cli
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/palavrapasse/import/internal/entity"
+)
+
+var exampleCommand = fmt.Sprintf(`./import --database-path="path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
+	entity.DateFormatLayout)
 
 func CreateAppHelpTemplate(base string) string {
 
-	// Append to an existing template
 	return fmt.Sprintf(`%s
 EXAMPLE: 
 	%s
