@@ -42,7 +42,7 @@ func CreateCliFlags(databasePath *string, leakPath *string, context *string, pla
 			Name:        FlagLeakPlatforms,
 			Aliases:     AliasesFlagLeakPlatforms,
 			Usage:       "Platforms affected by the leak (separated by commas)",
-			Value:       cli.NewStringSlice("default"),
+			Value:       cli.NewStringSlice("Unknown"),
 			Required:    false,
 			Destination: platforms,
 		},
