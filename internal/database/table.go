@@ -111,7 +111,7 @@ func NewHashCredentialsTable(cr []Credentials) HashCredentialsTable {
 	rs := make(Records, len(cr))
 
 	for i, v := range cr {
-		rs[i] = NewHashCredentials(v.CredId, NewHSHA256(string(v.Password)))
+		rs[i] = NewHashCredentials(v)
 	}
 
 	return HashCredentialsTable{Records: rs}
@@ -121,7 +121,7 @@ func NewHashUserTable(us []User) HashUserTable {
 	rs := make(Records, len(us))
 
 	for i, v := range us {
-		rs[i] = NewHashUser(v.UserId, NewHSHA256(string(v.Email)))
+		rs[i] = NewHashUser(v)
 	}
 
 	return HashUserTable{Records: rs}
@@ -132,7 +132,7 @@ func NewLeakBadActorTable(lba map[Leak][]BadActor) LeakBadActorTable {
 
 	for l, bas := range lba {
 		for _, ba := range bas {
-			rs = append(rs, NewLeakBadActor(ba.BaId, l.LeakId))
+			rs = append(rs, NewLeakBadActor(ba, l))
 		}
 	}
 
@@ -144,7 +144,7 @@ func NewLeakCredentialsTable(lcr map[Leak][]Credentials) LeakCredentialsTable {
 
 	for l, crs := range lcr {
 		for _, cr := range crs {
-			rs = append(rs, NewLeakCredentials(cr.CredId, l.LeakId))
+			rs = append(rs, NewLeakCredentials(cr, l))
 		}
 	}
 
@@ -156,7 +156,7 @@ func NewLeakPlatformTable(lpt map[Leak][]Platform) LeakPlatformTable {
 
 	for l, pts := range lpt {
 		for _, pt := range pts {
-			rs = append(rs, NewLeakPlatform(pt.PlatId, l.LeakId))
+			rs = append(rs, NewLeakPlatform(pt, l))
 		}
 	}
 
@@ -168,7 +168,7 @@ func NewLeakUserTable(lus map[Leak][]User) LeakUserTable {
 
 	for l, us := range lus {
 		for _, u := range us {
-			rs = append(rs, NewLeakUser(u.UserId, l.LeakId))
+			rs = append(rs, NewLeakUser(u, l))
 		}
 	}
 
