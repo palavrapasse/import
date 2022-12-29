@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	FlagDatabasePath  = "database-path"
 	FlagLeakPath      = "leak-path"
 	FlagLeakContext   = "context"
 	FlagLeakPlatforms = "platforms"
@@ -28,16 +29,13 @@ const (
 	ProceedLongAnswer  = "yes"
 )
 
-const (
-	DBFilePath = "../fandom/database2.sqlite"
-)
-
 var ProceedAnswers = []string{ProceedShortAnswer, ProceedLongAnswer}
-var ExampleCommand = fmt.Sprintf(`./import --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
+var ExampleCommand = fmt.Sprintf(`./import --database-path=""path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
 	entity.DateFormatLayout)
 
 func main() {
 
+	var databasePath string
 	var leakPath string
 	var context string
 	var platforms cli.StringSlice
@@ -55,12 +53,19 @@ func main() {
 		HideVersion:          false,
 		Authors:              createCliAuthors(),
 		Commands:             []*cli.Command{},
-		Flags:                createCliFlags(&leakPath, &context, &platforms, &shareDate, &leakers),
+		Flags:                createCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers),
 		Action: func(cCtx *cli.Context) error {
-			err := validateFilePath(leakPath, FlagLeakPath)
 
-			if err != nil {
-				return err
+			var errors []error
+
+			err := validateFilePath(leakPath, FlagLeakPath)
+			errors = appendValidError(errors, err)
+
+			err = validateFilePath(databasePath, FlagDatabasePath)
+			errors = appendValidError(errors, err)
+
+			if len(errors) != 0 {
+				return errors[0]
 			}
 
 			var parser parser.LeakParser = parser.PlainTextLeakParser{
@@ -88,8 +93,6 @@ func main() {
 					return nil
 				}
 			}
-
-			var errors []error
 
 			platformsSlice := platforms.Value()
 			err = validateFlagValues(platformsSlice, FlagLeakPlatforms)
@@ -127,7 +130,7 @@ func main() {
 				Leakers:           leakBadActors,
 			}
 
-			err = storeImport(i)
+			err = storeImport(databasePath, i)
 
 			if err != nil {
 				return err
@@ -156,9 +159,16 @@ func createCliAuthors() []*cli.Author {
 	}
 }
 
-func createCliFlags(leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice) []cli.Flag {
+func createCliFlags(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice) []cli.Flag {
 
 	return []cli.Flag{
+		&cli.PathFlag{
+			Name:        FlagDatabasePath,
+			Aliases:     []string{"db"},
+			Usage:       "Store leaks into `SQLite Database`",
+			Required:    true,
+			Destination: databasePath,
+		},
 		&cli.PathFlag{
 			Name:        FlagLeakPath,
 			Aliases:     []string{"lp"},
@@ -212,8 +222,8 @@ WEBSITE:
 `, base, ExampleCommand)
 }
 
-func storeImport(i entity.Import) error {
-	dbctx, err := database.NewDatabaseContext(DBFilePath)
+func storeImport(databasePath string, i entity.Import) error {
+	dbctx, err := database.NewDatabaseContext(databasePath)
 
 	if dbctx.DB != nil {
 		defer dbctx.DB.Close()
