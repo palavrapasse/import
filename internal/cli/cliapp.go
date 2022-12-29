@@ -71,7 +71,7 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 					log.Println(v)
 				}
 
-				log.Println("Proceed with import?")
+				fmt.Println("Proceed with import?")
 				reader := bufio.NewReader(os.Stdin)
 				input, _, errRead := reader.ReadLine()
 
