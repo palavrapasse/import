@@ -55,7 +55,7 @@ func main() {
 		HideVersion:          false,
 		Authors:              createCliAuthors(),
 		Commands:             []*cli.Command{},
-		Flags:                createCliFlags(leakPath, context, platforms, shareDate, leakers),
+		Flags:                createCliFlags(&leakPath, &context, &platforms, &shareDate, &leakers),
 		Action: func(cCtx *cli.Context) error {
 			err := validateFilePath(leakPath, FlagLeakPath)
 
@@ -67,12 +67,12 @@ func main() {
 				FilePath: leakPath,
 			}
 
-			leakParse, errors := parser.Parse()
+			leakParse, errParse := parser.Parse()
 
-			if errors != nil {
+			if errParse != nil {
 				log.Println("Found the following errors parsing leak:")
 
-				for _, v := range errors {
+				for _, v := range errParse {
 					log.Println(v)
 				}
 
@@ -84,49 +84,40 @@ func main() {
 					return errRead
 				}
 
-				if contains(ProceedAnswers, strings.ToLower(string(input))) {
+				if !contains(ProceedAnswers, strings.ToLower(string(input))) {
 					return nil
 				}
 			}
 
+			var errors []error
+
 			platformsSlice := platforms.Value()
 			err = validateFlagValues(platformsSlice, FlagLeakPlatforms)
-
-			if err != nil {
-				return err
-			}
+			errors = appendValidError(errors, err)
 
 			leakersSlice := leakers.Value()
 			err = validateFlagValues(leakersSlice, FlagLeakers)
+			errors = appendValidError(errors, err)
 
-			if err != nil {
-				return err
-			}
+			leakPlatforms, err := createPlatforms(platformsSlice)
+			errors = appendValidError(errors, err)
+
+			leakBadActors, err := createBadActors(leakersSlice)
+			errors = appendValidError(errors, err)
 
 			shareDateFormat := shareDate.Value().Format(entity.DateFormatLayout)
-
 			sharedatesc, err := entity.NewDateInSeconds(shareDateFormat)
+			errors = appendValidError(errors, err)
 
-			if err != nil {
-				return err
+			if len(errors) != 0 {
+				return errors[0]
 			}
 
 			leak, err := entity.NewLeak(context, sharedatesc)
+			errors = appendValidError(errors, err)
 
-			if err != nil {
-				return err
-			}
-
-			leakPlatforms, err := createPlatforms(platformsSlice)
-
-			if err != nil {
-				return err
-			}
-
-			leakBadActors, err := createBadActors(leakersSlice)
-
-			if err != nil {
-				return err
+			if len(errors) != 0 {
+				return errors[0]
 			}
 
 			i := entity.Import{
@@ -165,7 +156,7 @@ func createCliAuthors() []*cli.Author {
 	}
 }
 
-func createCliFlags(leakPath string, context string, platforms cli.StringSlice, shareDate cli.Timestamp, leakers cli.StringSlice) []cli.Flag {
+func createCliFlags(leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice) []cli.Flag {
 
 	return []cli.Flag{
 		&cli.PathFlag{
@@ -173,14 +164,14 @@ func createCliFlags(leakPath string, context string, platforms cli.StringSlice, 
 			Aliases:     []string{"lp"},
 			Usage:       "Load leak from `FILE`",
 			Required:    true,
-			Destination: &leakPath,
+			Destination: leakPath,
 		},
 		&cli.StringFlag{
 			Name:        FlagLeakContext,
 			Aliases:     []string{"c"},
 			Usage:       "Leak Context",
 			Required:    true,
-			Destination: &context,
+			Destination: context,
 		},
 		&cli.StringSliceFlag{
 			Name:        FlagLeakPlatforms,
@@ -188,7 +179,7 @@ func createCliFlags(leakPath string, context string, platforms cli.StringSlice, 
 			Usage:       "Platforms affected by the leak (separated by commas)",
 			Value:       cli.NewStringSlice("default"),
 			Required:    false,
-			Destination: &platforms,
+			Destination: platforms,
 		},
 		&cli.TimestampFlag{
 			Name:        FlagLeakShareDate,
@@ -196,14 +187,14 @@ func createCliFlags(leakPath string, context string, platforms cli.StringSlice, 
 			Usage:       "Leak Share Date",
 			Layout:      entity.DateFormatLayout,
 			Required:    true,
-			Destination: &shareDate,
+			Destination: shareDate,
 		},
 		&cli.StringSliceFlag{
 			Name:        FlagLeakers,
 			Aliases:     []string{"l"},
 			Usage:       "Leakers (separated by commas)",
 			Required:    true,
-			Destination: &leakers,
+			Destination: leakers,
 		},
 	}
 }
@@ -298,4 +289,13 @@ func contains(s []string, e string) bool {
 	}
 
 	return false
+}
+
+func appendValidError(errors []error, err error) []error {
+
+	if err != nil {
+		errors = append(errors, err)
+	}
+
+	return errors
 }
