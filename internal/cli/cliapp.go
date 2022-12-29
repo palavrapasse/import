@@ -131,25 +131,12 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 		},
 	}
 
-	cli.AppHelpTemplate = createAppHelpTemplate(cli.AppHelpTemplate)
+	cli.AppHelpTemplate = CreateAppHelpTemplate(cli.AppHelpTemplate)
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	return *app
-}
-
-func createAppHelpTemplate(base string) string {
-
-	// Append to an existing template
-	return fmt.Sprintf(`%s
-EXAMPLE: 
-	%s
-
-WEBSITE:
-	https://github.com/palavrapasse
-
-`, base, exampleCommand)
 }
 
 func createPlatforms(platforms []string) ([]entity.Platform, error) {
