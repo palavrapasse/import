@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	DateFormatLayout = "2006-01-02T15:04:05.000Z"
+	DateFormatLayout = "2006-01-02"
 )
 
 type DateInSeconds int64 // Epoch time in Seconds

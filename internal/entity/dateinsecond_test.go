@@ -35,7 +35,7 @@ func TestCannotCreateDateInSecondsWithInvadidDateFormat(t *testing.T) {
 }
 
 func TestCanCreateDateInSeconds(t *testing.T) {
-	date := "2022-12-02T19:04:05.000Z"
+	date := "2022-12-02"
 
 	_, err := NewDateInSeconds(date)
 
@@ -45,7 +45,7 @@ func TestCanCreateDateInSeconds(t *testing.T) {
 }
 
 func TestCanReturnDateInSecondsString(t *testing.T) {
-	date := "2022-12-02T19:04:05.000Z"
+	date := "2022-12-02"
 	ds, _ := NewDateInSeconds(date)
 
 	dsString := ds.String()
