@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/palavrapasse/import/internal/database"
 	"github.com/palavrapasse/import/internal/entity"
@@ -31,10 +32,10 @@ const (
 	DBFilePath = "../fandom/database2.sqlite"
 )
 
-func main() {
+var ExampleCommand = fmt.Sprintf(`./import --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
+	entity.DateFormatLayout)
 
-	exampleCommand := fmt.Sprintf(`./import --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
-		entity.DateFormatLayout)
+func main() {
 
 	var leakPath string
 	var context string
@@ -46,57 +47,16 @@ func main() {
 		Name:                 "import",
 		Version:              "v0.0.1",
 		Usage:                "Imports leak files into SQLite",
-		Copyright:            "(c) 2022 palavrapasse",
+		Copyright:            fmt.Sprintf("(c) %d palavrapasse", time.Now().Year()),
 		Suggest:              true,
 		EnableBashCompletion: true,
 		HideHelp:             false,
 		HideVersion:          false,
-		Authors: []*cli.Author{
-			{Name: "João Freitas"},
-			{Name: "Rute Santos"},
-		},
-		Commands: []*cli.Command{},
-		Flags: []cli.Flag{
-			&cli.PathFlag{
-				Name:        FlagLeakPath,
-				Aliases:     []string{"lp"},
-				Usage:       "Load leak from `FILE`",
-				Required:    true,
-				Destination: &leakPath,
-			},
-			&cli.StringFlag{
-				Name:        FlagLeakContext,
-				Aliases:     []string{"c"},
-				Usage:       "Leak Context",
-				Required:    true,
-				Destination: &context,
-			},
-			&cli.StringSliceFlag{
-				Name:        FlagLeakPlatforms,
-				Aliases:     []string{"p"},
-				Usage:       "Platforms affected by the leak (comma separator)",
-				Value:       cli.NewStringSlice("default"),
-				Required:    false,
-				Destination: &platforms,
-			},
-			&cli.TimestampFlag{
-				Name:        FlagLeakShareDate,
-				Aliases:     []string{"sd"},
-				Usage:       "Leak Share Date",
-				Layout:      entity.DateFormatLayout,
-				Required:    true,
-				Destination: &shareDate,
-			},
-			&cli.StringSliceFlag{
-				Name:        FlagLeakers,
-				Aliases:     []string{"l"},
-				Usage:       "Leakers (comma separator)",
-				Required:    true,
-				Destination: &leakers,
-			},
-		},
+		Authors:              createCliAuthors(),
+		Commands:             []*cli.Command{},
+		Flags:                createCliFlags(leakPath, context, platforms, shareDate, leakers),
 		Action: func(cCtx *cli.Context) error {
-			err := validateValue(leakPath, FlagLeakPath)
+			err := validateFilePath(leakPath, FlagLeakPath)
 
 			if err != nil {
 				return err
@@ -181,19 +141,12 @@ func main() {
 				return err
 			}
 
+			log.Println("Successful Import")
 			return nil
 		},
 	}
 
-	// Append to an existing template
-	cli.AppHelpTemplate = fmt.Sprintf(`%s
-EXAMPLE: 
-	%s
-
-WEBSITE:
-	https://github.com/palavrapasse
-
-`, cli.AppHelpTemplate, exampleCommand)
+	cli.AppHelpTemplate = createAppHelpTemplate(cli.AppHelpTemplate)
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
@@ -201,6 +154,70 @@ WEBSITE:
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func createCliAuthors() []*cli.Author {
+
+	return []*cli.Author{
+		{Name: "João Freitas"},
+		{Name: "Rute Santos"},
+	}
+}
+
+func createCliFlags(leakPath string, context string, platforms cli.StringSlice, shareDate cli.Timestamp, leakers cli.StringSlice) []cli.Flag {
+
+	return []cli.Flag{
+		&cli.PathFlag{
+			Name:        FlagLeakPath,
+			Aliases:     []string{"lp"},
+			Usage:       "Load leak from `FILE`",
+			Required:    true,
+			Destination: &leakPath,
+		},
+		&cli.StringFlag{
+			Name:        FlagLeakContext,
+			Aliases:     []string{"c"},
+			Usage:       "Leak Context",
+			Required:    true,
+			Destination: &context,
+		},
+		&cli.StringSliceFlag{
+			Name:        FlagLeakPlatforms,
+			Aliases:     []string{"p"},
+			Usage:       "Platforms affected by the leak (separated by commas)",
+			Value:       cli.NewStringSlice("default"),
+			Required:    false,
+			Destination: &platforms,
+		},
+		&cli.TimestampFlag{
+			Name:        FlagLeakShareDate,
+			Aliases:     []string{"sd"},
+			Usage:       "Leak Share Date",
+			Layout:      entity.DateFormatLayout,
+			Required:    true,
+			Destination: &shareDate,
+		},
+		&cli.StringSliceFlag{
+			Name:        FlagLeakers,
+			Aliases:     []string{"l"},
+			Usage:       "Leakers (separated by commas)",
+			Required:    true,
+			Destination: &leakers,
+		},
+	}
+}
+
+func createAppHelpTemplate(base string) string {
+
+	// Append to an existing template
+	return fmt.Sprintf(`%s
+EXAMPLE: 
+	%s
+
+WEBSITE:
+	https://github.com/palavrapasse
+
+`, base, ExampleCommand)
 }
 
 func storeImport(i entity.Import) error {
@@ -211,7 +228,7 @@ func storeImport(i entity.Import) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("error while creating DB context")
+		return fmt.Errorf("could not open database connection: %v", err)
 	}
 
 	err = dbctx.Insert(i)
@@ -220,7 +237,6 @@ func storeImport(i entity.Import) error {
 		return fmt.Errorf("error while storing data in DB %v", err)
 	}
 
-	log.Println("Successful Import")
 	return nil
 }
 
@@ -256,9 +272,9 @@ func createBadActors(leakers []string) ([]entity.BadActor, error) {
 	return list, nil
 }
 
-func validateValue(value string, flag string) error {
-	if strings.TrimSpace(value) == "" {
-		return fmt.Errorf("%s should not be empty or white spaces", flag)
+func validateFilePath(value string, flag string) error {
+	if len(strings.TrimSpace(value)) == 0 {
+		return fmt.Errorf("%s should not be empty or only white spaces", flag)
 	}
 
 	return nil
