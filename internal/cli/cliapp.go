@@ -15,15 +15,6 @@ import (
 )
 
 const (
-	flagDatabasePath  = "database-path"
-	flagLeakPath      = "leak-path"
-	flagLeakContext   = "context"
-	flagLeakPlatforms = "platforms"
-	flagLeakShareDate = "share-date"
-	flagLeakers       = "leakers"
-)
-
-const (
 	proceedShortAnswer = "y"
 	proceedLongAnswer  = "yes"
 )
@@ -52,15 +43,15 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 		HideVersion:          false,
 		Authors:              createCliAuthors(),
 		Commands:             []*cli.Command{},
-		Flags:                createCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers),
+		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers),
 		Action: func(cCtx *cli.Context) error {
 
 			var errors []error
 
-			err := validateFilePath(leakPath, flagLeakPath)
+			err := validateFilePath(leakPath, FlagLeakPath)
 			errors = appendValidError(errors, err)
 
-			err = validateFilePath(databasePath, flagDatabasePath)
+			err = validateFilePath(databasePath, FlagDatabasePath)
 			errors = appendValidError(errors, err)
 
 			if len(errors) != 0 {
@@ -94,11 +85,11 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 			}
 
 			platformsSlice := platforms.Value()
-			err = validateFlagValues(platformsSlice, flagLeakPlatforms)
+			err = validateFlagValues(platformsSlice, FlagLeakPlatforms)
 			errors = appendValidError(errors, err)
 
 			leakersSlice := leakers.Value()
-			err = validateFlagValues(leakersSlice, flagLeakers)
+			err = validateFlagValues(leakersSlice, FlagLeakers)
 			errors = appendValidError(errors, err)
 
 			leakPlatforms, err := createPlatforms(platformsSlice)
@@ -153,56 +144,6 @@ func createCliAuthors() []*cli.Author {
 	return []*cli.Author{
 		{Name: "João Freitas"},
 		{Name: "Rute Santos"},
-	}
-}
-
-func createCliFlags(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice) []cli.Flag {
-
-	return []cli.Flag{
-		&cli.PathFlag{
-			Name:        flagDatabasePath,
-			Aliases:     AliasesFlagDatabasePath,
-			Usage:       "Store leaks into `SQLite Database`",
-			Required:    true,
-			Destination: databasePath,
-		},
-		&cli.PathFlag{
-			Name:        flagLeakPath,
-			Aliases:     AliasesFlagLeakPath,
-			Usage:       "Load leak from `FILE`",
-			Required:    true,
-			Destination: leakPath,
-		},
-		&cli.StringFlag{
-			Name:        flagLeakContext,
-			Aliases:     AliasesFlagLeakContext,
-			Usage:       "Leak Context",
-			Required:    true,
-			Destination: context,
-		},
-		&cli.StringSliceFlag{
-			Name:        flagLeakPlatforms,
-			Aliases:     AliasesFlagLeakPlatforms,
-			Usage:       "Platforms affected by the leak (separated by commas)",
-			Value:       cli.NewStringSlice("default"),
-			Required:    false,
-			Destination: platforms,
-		},
-		&cli.TimestampFlag{
-			Name:        flagLeakShareDate,
-			Aliases:     AliasesFlagLeakShareDate,
-			Usage:       "Leak Share Date",
-			Layout:      entity.DateFormatLayout,
-			Required:    true,
-			Destination: shareDate,
-		},
-		&cli.StringSliceFlag{
-			Name:        flagLeakers,
-			Aliases:     AliasesFlagLeakers,
-			Usage:       "Leakers (separated by commas)",
-			Required:    true,
-			Destination: leakers,
-		},
 	}
 }
 
