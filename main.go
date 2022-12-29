@@ -69,13 +69,13 @@ func main() {
 			leakParse, errors := parser.Parse()
 
 			if errors != nil {
-				log.Println("Found the following errors in the file:")
+				log.Println("Found the following errors parsing leak:")
 
 				for _, v := range errors {
 					log.Println(v)
 				}
 
-				log.Println("Should the import be proceeded?")
+				log.Println("Proceed with import?")
 				reader := bufio.NewReader(os.Stdin)
 				input, _, errRead := reader.ReadLine()
 
@@ -89,14 +89,14 @@ func main() {
 			}
 
 			platformsSlice := platforms.Value()
-			err = validateSlice(platformsSlice, FlagLeakPlatforms)
+			err = validateFlagValues(platformsSlice, FlagLeakPlatforms)
 
 			if err != nil {
 				return err
 			}
 
 			leakersSlice := leakers.Value()
-			err = validateSlice(leakersSlice, FlagLeakers)
+			err = validateFlagValues(leakersSlice, FlagLeakers)
 
 			if err != nil {
 				return err
@@ -280,7 +280,7 @@ func validateFilePath(value string, flag string) error {
 	return nil
 }
 
-func validateSlice(value []string, flag string) error {
+func validateFlagValues(value []string, flag string) error {
 	if len(value) == 0 {
 		return fmt.Errorf("%s should not be empty", flag)
 	}
