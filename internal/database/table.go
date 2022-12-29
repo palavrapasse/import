@@ -248,16 +248,8 @@ func (pt PrimaryTable) Name() string {
 	return DatabaseTable(pt).Name()
 }
 
-func (ft ForeignTable) Name() string {
-	return DatabaseTable(ft).Name()
-}
-
 func (pt PrimaryTable) Fields() []Field {
 	return DatabaseTable(pt).Fields()
-}
-
-func (ft ForeignTable) Fields() []Field {
-	return DatabaseTable(ft).Fields()
 }
 
 func (pt PrimaryTable) Values(r Record) []any {
@@ -268,16 +260,8 @@ func (pt PrimaryTable) InsertFields() []Field {
 	return DatabaseTable(pt).Fields()[1:]
 }
 
-func (ft ForeignTable) InsertFields() []Field {
-	return DatabaseTable(ft).Fields()
-}
-
 func (pt PrimaryTable) InsertValues(r Record) []any {
 	return Values(r)[1:]
-}
-
-func (ft ForeignTable) InsertValues(r Record) []any {
-	return Values(r)
 }
 
 func (pt PrimaryTable) FindFields() []Field {
@@ -300,10 +284,6 @@ func (pt PrimaryTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
 
 }
 
-func (ft ForeignTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
-	return tx.Prepare(ft.prepareInsertStatementString())
-}
-
 func (pt PrimaryTable) PrepareFindStatement(tx *sql.Tx) (*sql.Stmt, error) {
 	return tx.Prepare(pt.prepareFindStatementString())
 
@@ -311,6 +291,26 @@ func (pt PrimaryTable) PrepareFindStatement(tx *sql.Tx) (*sql.Stmt, error) {
 
 func (pt PrimaryTable) Copy(rs Records) PrimaryTable {
 	return PrimaryTable{Records: rs}
+}
+
+func (ft ForeignTable) Name() string {
+	return DatabaseTable(ft).Name()
+}
+
+func (ft ForeignTable) Fields() []Field {
+	return DatabaseTable(ft).Fields()
+}
+
+func (ft ForeignTable) InsertFields() []Field {
+	return DatabaseTable(ft).Fields()
+}
+
+func (ft ForeignTable) InsertValues(r Record) []any {
+	return Values(r)
+}
+
+func (ft ForeignTable) PrepareInsertStatement(tx *sql.Tx) (*sql.Stmt, error) {
+	return tx.Prepare(ft.prepareInsertStatementString())
 }
 
 func (ft ForeignTable) Copy(rs Records) ForeignTable {
@@ -344,18 +344,18 @@ func (pt PrimaryTable) prepareInsertStatementString() string {
 	return prepareInsertStatementString(tableName, tableFields)
 }
 
-func (ft ForeignTable) prepareInsertStatementString() string {
-	tableName := ft.Name()
-	tableFields := ft.Fields()
-
-	return prepareInsertStatementString(tableName, tableFields)
-}
-
 func (pt PrimaryTable) prepareFindStatementString() string {
 	tableName := pt.Name()
 	tableFindFields := pt.FindFields()
 
 	return prepareFindStatementString(tableName, tableFindFields)
+}
+
+func (ft ForeignTable) prepareInsertStatementString() string {
+	tableName := ft.Name()
+	tableFields := ft.Fields()
+
+	return prepareInsertStatementString(tableName, tableFields)
 }
 
 func prepareInsertStatementString(tableName string, tableFields []Field) string {
