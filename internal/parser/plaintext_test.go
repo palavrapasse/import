@@ -101,8 +101,8 @@ func TestCanParseLinesToLeakWithPasswordThatContainsSeparator(t *testing.T) {
 
 func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
 	email := "test@aaa"
-	password := "dghfaaa,;.78"
-	lines := []string{fmt.Sprintf("%s:%s", email, password)}
+	p := "dghfaaa,;.78"
+	lines := []string{fmt.Sprintf("%s:%s", email, p)}
 
 	leak, err := linesToLeakParse(lines)
 
@@ -115,15 +115,15 @@ func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
 	user := entity.User{Email: entity.Email(email)}
 	result := leak[user].Password
 
-	if result != entity.Password(password) {
-		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", password, result)
+	if result != entity.Password(p) {
+		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
 	}
 }
 
 func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
 	email := "test@aaa"
-	password := "dghf:aaa,;.78"
-	lines := []string{fmt.Sprintf("%s:%s", email, password)}
+	p := "dghf:aaa,;.78"
+	lines := []string{fmt.Sprintf("%s:%s", email, p)}
 
 	leak, err := linesToLeakParse(lines)
 
@@ -136,8 +136,8 @@ func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
 	user := entity.User{Email: entity.Email(email)}
 	result := leak[user].Password
 
-	if result != entity.Password(password) {
-		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", password, result)
+	if result != entity.Password(p) {
+		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
 	}
 }
 
