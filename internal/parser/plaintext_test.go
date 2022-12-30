@@ -108,10 +108,6 @@ func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
 
 	panicOnError(err)
 
-	if len(leak) != 1 {
-		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
-	}
-
 	user := entity.User{Email: entity.Email(email)}
 	result := leak[user].Password
 
@@ -128,10 +124,6 @@ func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
 	leak, err := linesToLeakParse(lines)
 
 	panicOnError(err)
-
-	if len(leak) != 1 {
-		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
-	}
 
 	user := entity.User{Email: entity.Email(email)}
 	result := leak[user].Password

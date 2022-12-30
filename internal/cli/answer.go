@@ -7,7 +7,6 @@ const (
 
 var proceedAnswers = []string{proceedShortAnswer, proceedLongAnswer}
 
-
 func IsProceedAnswer(s []string, e string) bool {
 	for _, a := range s {
 
