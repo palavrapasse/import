@@ -85,6 +85,18 @@ func TestCanParseLinesToLeakWithOnlyValidLines(t *testing.T) {
 	}
 }
 
+func TestCanParseLinesToLeakWithPasswordThatContaisSeparator(t *testing.T) {
+	lines := []string{"test@aaa:dghf:aaa"}
+
+	leak, err := linesToLeakParse(lines)
+
+	panicOnError(err)
+
+	if len(leak) == 0 {
+		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
+	}
+}
+
 func TestCannotFindUnknownSeparator(t *testing.T) {
 	line := "my.username-my.password"
 
@@ -125,5 +137,11 @@ func TestCanFindSemiColonSeparator(t *testing.T) {
 
 	if sep != testSep {
 		t.Fatalf("A semicolon separator is present in line, but a different separator was found (%s)\n", testSep)
+	}
+}
+
+func panicOnError(err []error) {
+	if len(err) != 0 {
+		panic(err)
 	}
 }
