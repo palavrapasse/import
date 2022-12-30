@@ -85,14 +85,14 @@ func TestCanParseLinesToLeakWithOnlyValidLines(t *testing.T) {
 	}
 }
 
-func TestCanParseLinesToLeakWithPasswordThatContaisSeparator(t *testing.T) {
+func TestCanParseLinesToLeakWithPasswordThatContainsSeparator(t *testing.T) {
 	lines := []string{"test@aaa:dghf:aaa"}
 
 	leak, err := linesToLeakParse(lines)
 
 	panicOnError(err)
 
-	if len(leak) == 0 {
+	if len(leak) != 1 {
 		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
 	}
 }
