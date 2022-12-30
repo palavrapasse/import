@@ -63,7 +63,7 @@ func lineToUserCredential(line string, separator string) (entity.User, entity.Cr
 
 	lineSplit := strings.Split(line, separator)
 
-	if len(lineSplit) != NumberPositions {
+	if len(lineSplit) < NumberPositions {
 		err := fmt.Errorf("Input incorrect. Line %v should contain email and password information", line)
 		return entity.User{}, entity.Credentials{}, err
 	}
@@ -75,7 +75,7 @@ func lineToUserCredential(line string, separator string) (entity.User, entity.Cr
 		return entity.User{}, entity.Credentials{}, err
 	}
 
-	password := string(lineSplit[PasswordPosition])
+	password := string(strings.Join(lineSplit[PasswordPosition:], separator))
 	p, err := entity.NewPassword(password)
 
 	if err != nil {

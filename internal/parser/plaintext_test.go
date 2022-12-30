@@ -3,6 +3,8 @@ package parser
 import (
 	"fmt"
 	"testing"
+
+	"github.com/palavrapasse/import/internal/entity"
 )
 
 func TestCannotParseEmptyLines(t *testing.T) {
@@ -85,6 +87,52 @@ func TestCanParseLinesToLeakWithOnlyValidLines(t *testing.T) {
 	}
 }
 
+func TestCanParseLinesToLeakWithPasswordThatContainsSeparator(t *testing.T) {
+	lines := []string{"test@aaa:dghf:aaa"}
+
+	leak, err := linesToLeakParse(lines)
+
+	panicOnError(err)
+
+	if len(leak) != 1 {
+		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
+	}
+}
+
+func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
+	email := "test@aaa"
+	p := "dghfaaa,;.78"
+	lines := []string{fmt.Sprintf("%s:%s", email, p)}
+
+	leak, err := linesToLeakParse(lines)
+
+	panicOnError(err)
+
+	user := entity.User{Email: entity.Email(email)}
+	result := leak[user].Password
+
+	if result != entity.Password(p) {
+		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
+	}
+}
+
+func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
+	email := "test@aaa"
+	p := "dghf:aaa,;.78"
+	lines := []string{fmt.Sprintf("%s:%s", email, p)}
+
+	leak, err := linesToLeakParse(lines)
+
+	panicOnError(err)
+
+	user := entity.User{Email: entity.Email(email)}
+	result := leak[user].Password
+
+	if result != entity.Password(p) {
+		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
+	}
+}
+
 func TestCannotFindUnknownSeparator(t *testing.T) {
 	line := "my.username-my.password"
 
@@ -125,5 +173,11 @@ func TestCanFindSemiColonSeparator(t *testing.T) {
 
 	if sep != testSep {
 		t.Fatalf("A semicolon separator is present in line, but a different separator was found (%s)\n", testSep)
+	}
+}
+
+func panicOnError(err []error) {
+	if len(err) != 0 {
+		panic(err)
 	}
 }
