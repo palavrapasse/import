@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
+	"github.com/palavrapasse/damn/pkg/database"
+	"github.com/palavrapasse/damn/pkg/entity"
 	"github.com/palavrapasse/import/internal/cli"
-	"github.com/palavrapasse/import/internal/database"
-	"github.com/palavrapasse/import/internal/entity"
 )
 
 func main() {

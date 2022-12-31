@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/palavrapasse/import/internal/entity"
+	"github.com/palavrapasse/damn/pkg/entity"
 )
 
 func TestCannotParseEmptyLines(t *testing.T) {

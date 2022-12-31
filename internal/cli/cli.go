@@ -5,7 +5,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/palavrapasse/import/internal/entity"
+	"github.com/palavrapasse/damn/pkg/entity"
 	"github.com/urfave/cli/v2"
 )
 
