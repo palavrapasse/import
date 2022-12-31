@@ -92,7 +92,7 @@ func TestCanParseLinesToLeakWithPasswordThatContainsSeparator(t *testing.T) {
 
 	leak, err := linesToLeakParse(lines)
 
-	panicOnError(err)
+	panicOnErrors(err)
 
 	if len(leak) != 1 {
 		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
@@ -106,7 +106,7 @@ func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
 
 	leak, err := linesToLeakParse(lines)
 
-	panicOnError(err)
+	panicOnErrors(err)
 
 	user := entity.User{Email: entity.Email(email)}
 	result := leak[user].Password
@@ -123,7 +123,7 @@ func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
 
 	leak, err := linesToLeakParse(lines)
 
-	panicOnError(err)
+	panicOnErrors(err)
 
 	user := entity.User{Email: entity.Email(email)}
 	result := leak[user].Password
@@ -147,7 +147,9 @@ func TestCanFindCommaSeparator(t *testing.T) {
 	testSep := CommaSeparator
 	line := fmt.Sprintf("my.username%smy.password", testSep)
 
-	sep, _ := findSeparator(line)
+	sep, err := findSeparator(line)
+
+	panicOnError(err)
 
 	if sep != testSep {
 		t.Fatalf("A comma separator is present in line, but a different separator was found (%s)\n", testSep)
@@ -158,7 +160,9 @@ func TestCanFindColonSeparator(t *testing.T) {
 	testSep := ColonSeparator
 	line := fmt.Sprintf("my.username%smy.password", testSep)
 
-	sep, _ := findSeparator(line)
+	sep, err := findSeparator(line)
+
+	panicOnError(err)
 
 	if sep != testSep {
 		t.Fatalf("A colon separator is present in line, but a different separator was found (%s)\n", testSep)
@@ -169,15 +173,11 @@ func TestCanFindSemiColonSeparator(t *testing.T) {
 	testSep := SemiColonSeparator
 	line := fmt.Sprintf("my.username%smy.password", testSep)
 
-	sep, _ := findSeparator(line)
+	sep, err := findSeparator(line)
+
+	panicOnError(err)
 
 	if sep != testSep {
 		t.Fatalf("A semicolon separator is present in line, but a different separator was found (%s)\n", testSep)
-	}
-}
-
-func panicOnError(err []error) {
-	if len(err) != 0 {
-		panic(err)
 	}
 }

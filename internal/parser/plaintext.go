@@ -110,11 +110,13 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (entity.LeakP
 	}
 
 	for _, line := range lines {
+		var user entity.User
+		var credentials entity.Credentials
 
-		user, credential, err := lineToUserCredential(line, separator)
+		user, credentials, err = lineToUserCredential(line, separator)
 
 		if err == nil {
-			leak[user] = credential
+			leak[user] = credentials
 		} else {
 			processOnParseError(err, ecb...)
 			errors = append(errors, err)
