@@ -27,13 +27,13 @@ func storeImport(databasePath string, i entity.Import) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("could not open database connection: %v", err)
+		return fmt.Errorf("could not open database connection: %w", err)
 	}
 
 	err = dbctx.Insert(i)
 
 	if err != nil {
-		return fmt.Errorf("error while storing data in DB %v", err)
+		return fmt.Errorf("error while storing data in DB %w", err)
 	}
 
 	return nil
