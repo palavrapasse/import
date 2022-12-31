@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/palavrapasse/import/internal/entity"
+	"github.com/palavrapasse/damn/pkg/entity"
 	"github.com/palavrapasse/import/internal/parser"
 	"github.com/urfave/cli/v2"
 )

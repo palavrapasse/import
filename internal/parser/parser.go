@@ -1,6 +1,6 @@
 package parser
 
-import "github.com/palavrapasse/import/internal/entity"
+import "github.com/palavrapasse/damn/pkg/entity"
 
 type OnParseErrorCallback func(err error)
 

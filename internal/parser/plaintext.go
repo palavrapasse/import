@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/palavrapasse/import/internal/entity"
+	"github.com/palavrapasse/damn/pkg/entity"
 )
 
 const (
