@@ -7,14 +7,14 @@ import (
 	"strings"
 
 	"github.com/palavrapasse/damn/pkg/entity"
-	"github.com/palavrapasse/import/internal"
+	"github.com/palavrapasse/import/internal/logging"
 	"github.com/palavrapasse/import/internal/parser"
 	"github.com/urfave/cli/v2"
 )
 
 func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, storeImport func(databasePath string, i entity.Import) error) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		internal.Aspirador.Info("Starting Import")
+		logging.Aspirador.Info("Starting Import")
 
 		var errors []error
 
@@ -40,7 +40,7 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 			for _, v := range errParse {
 				errParseString = fmt.Sprintf("%s\n%s", errParseString, v)
 			}
-			internal.Aspirador.Warning(fmt.Sprintf("Found the following errors parsing leak: %s", errParseString))
+			logging.Aspirador.Warning(fmt.Sprintf("Found the following errors parsing leak: %s", errParseString))
 
 			fmt.Println("Proceed with import?")
 			reader := bufio.NewReader(os.Stdin)
@@ -51,7 +51,7 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 			}
 
 			if !IsProceedAnswer(proceedAnswers, strings.ToLower(string(input))) {
-				internal.Aspirador.Info("Stopped import")
+				logging.Aspirador.Info("Stopped import")
 				return nil
 			}
 		}
@@ -98,7 +98,7 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 			return err
 		}
 
-		internal.Aspirador.Info("Successful Import")
+		logging.Aspirador.Info("Successful Import")
 		return nil
 	}
 }

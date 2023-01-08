@@ -1,4 +1,4 @@
-package internal
+package logging
 
 import (
 	as "github.com/palavrapasse/aspirador/pkg"

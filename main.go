@@ -6,8 +6,8 @@ import (
 
 	"github.com/palavrapasse/damn/pkg/database"
 	"github.com/palavrapasse/damn/pkg/entity"
-	"github.com/palavrapasse/import/internal"
 	"github.com/palavrapasse/import/internal/cli"
+	"github.com/palavrapasse/import/internal/logging"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	app := cli.CreateCliApp(storeImport)
 
 	if err := app.Run(os.Args); err != nil {
-		internal.Aspirador.Error(err.Error())
+		logging.Aspirador.Error(err.Error())
 		return
 	}
 }
