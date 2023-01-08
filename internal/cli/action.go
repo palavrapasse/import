@@ -14,7 +14,7 @@ import (
 
 func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, storeImport func(databasePath string, i entity.Import) error) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
-		internal.Aspirador.Warning("Starting Import")
+		internal.Aspirador.Info("Starting Import")
 
 		var errors []error
 
