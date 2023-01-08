@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	as "github.com/palavrapasse/aspirador/pkg"
 	"github.com/palavrapasse/damn/pkg/database"
 	"github.com/palavrapasse/damn/pkg/entity"
 	"github.com/palavrapasse/import/internal/cli"
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+
+	logging.Aspirador = as.WithClients(logging.CreateAspiradorClients())
 
 	app := cli.CreateCliApp(storeImport)
 

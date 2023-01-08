@@ -6,6 +6,6 @@ import (
 
 var Aspirador as.Aspirador
 
-func init() {
-	Aspirador = as.NewAspirador()
+func CreateAspiradorClients() []as.Client {
+	return []as.Client{as.NewConsoleClient()}
 }
