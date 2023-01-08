@@ -2,20 +2,24 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
+	as "github.com/palavrapasse/aspirador/pkg"
 	"github.com/palavrapasse/damn/pkg/database"
 	"github.com/palavrapasse/damn/pkg/entity"
 	"github.com/palavrapasse/import/internal/cli"
+	"github.com/palavrapasse/import/internal/logging"
 )
 
 func main() {
 
+	logging.Aspirador = as.WithClients(logging.CreateAspiradorClients())
+
 	app := cli.CreateCliApp(storeImport)
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		logging.Aspirador.Error(err.Error())
+		return
 	}
 }
 
