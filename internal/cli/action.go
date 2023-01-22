@@ -36,11 +36,11 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 
 		if errParse != nil {
 
-			var errParseString string
+			logging.Aspirador.Warning("Found the following errors parsing leak:")
+
 			for _, v := range errParse {
-				errParseString = fmt.Sprintf("%s\n%s", errParseString, v)
+				logging.Aspirador.Warning(v.Error())
 			}
-			logging.Aspirador.Warning(fmt.Sprintf("Found the following errors parsing leak: %s", errParseString))
 
 			fmt.Println("Proceed with import?")
 			reader := bufio.NewReader(os.Stdin)
