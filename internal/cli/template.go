@@ -3,11 +3,11 @@ package cli
 import (
 	"fmt"
 
-	"github.com/palavrapasse/damn/pkg/entity"
+	"github.com/palavrapasse/damn/pkg/entity/query"
 )
 
-var exampleCommand = fmt.Sprintf(`./import --database-path="path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2"`,
-	entity.DateFormatLayout)
+var exampleCommand = fmt.Sprintf(`./import --database-path="path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2" --url="https://subscribeService/notify"`,
+	query.DateFormatLayout)
 
 func CreateAppHelpTemplate(base string) string {
 

@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/palavrapasse/damn/pkg/entity"
+	"github.com/palavrapasse/damn/pkg/entity/query"
 	"github.com/urfave/cli/v2"
 )
 
-func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) cli.App {
+func CreateCliApp(storeImport func(databasePath string, i query.Import) (entity.AutoGenKey, error), notifyImport func(entity.AutoGenKey, string) error) cli.App {
 
 	var databasePath string
 	var leakPath string
@@ -17,6 +18,7 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 	var platforms cli.StringSlice
 	var shareDate cli.Timestamp
 	var leakers cli.StringSlice
+	var notifyNewLeakURL string
 
 	app := &cli.App{
 		Name:                 "import",
@@ -28,8 +30,8 @@ func CreateCliApp(storeImport func(databasePath string, i entity.Import) error) 
 		HideHelp:             false,
 		HideVersion:          false,
 		Authors:              CreateCliAuthors(),
-		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers),
-		Action:               CreateAction(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, storeImport),
+		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, &notifyNewLeakURL),
+		Action:               CreateAction(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, &notifyNewLeakURL, storeImport, notifyImport),
 	}
 
 	cli.AppHelpTemplate = CreateAppHelpTemplate(cli.AppHelpTemplate)
