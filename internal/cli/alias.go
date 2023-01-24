@@ -6,4 +6,4 @@ var AliasesFlagLeakContext = []string{"c"}
 var AliasesFlagLeakPlatforms = []string{"p"}
 var AliasesFlagLeakShareDate = []string{"sd"}
 var AliasesFlagLeakers = []string{"l"}
-var AliasesFlagNotifyNewLeakURL = []string{"url"}
+var AliasesFlagNotifyNewLeakURL = []string{"notify-url"}
