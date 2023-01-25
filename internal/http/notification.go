@@ -10,7 +10,7 @@ import (
 	"github.com/palavrapasse/import/internal/logging"
 )
 
-const MAX_ATTEMPS_NOTIFY = 5
+const MaxAttemptsNotify = 5
 
 func NotifyNewLeak(leakId entity.AutoGenKey, subscribeServiceURL string) error {
 	logging.Aspirador.Info(fmt.Sprintf("Starting notification of new leak %d", leakId))
@@ -28,7 +28,7 @@ func NotifyNewLeak(leakId entity.AutoGenKey, subscribeServiceURL string) error {
 	attempt := 1
 	var resp *http.Response
 
-	for attempt <= MAX_ATTEMPS_NOTIFY {
+	for attempt <= MaxAttemptsNotify {
 		resp, err = http.Post(subscribeServiceURL, "application/json", responseBody)
 
 		if err != nil {
