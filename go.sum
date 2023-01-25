@@ -6,6 +6,8 @@ github.com/palavrapasse/aspirador v0.0.1 h1:PqdnHweSXfvYITOgOQC0JAXD3GeYV2x+rc4S
 github.com/palavrapasse/aspirador v0.0.1/go.mod h1:1LJFZgJoNr7In+g3PQHWwK6/Dha9jsiTT2jMV/eiAX8=
 github.com/palavrapasse/damn v0.0.1 h1:FF+TIPk5Y9CqahSA4x0sesEtBBsJiI5mAzWeC+Lx9K8=
 github.com/palavrapasse/damn v0.0.1/go.mod h1:7Yj+B7xykwnKufipuZq2z8daMuqhdd7USWe/cloc5NU=
+github.com/palavrapasse/damn v0.0.8 h1:UznHXASC+v7pZZvAR0kd3Kquyjztz49sQltEDkBNSCo=
+github.com/palavrapasse/damn v0.0.8/go.mod h1:7Yj+B7xykwnKufipuZq2z8daMuqhdd7USWe/cloc5NU=
 github.com/russross/blackfriday/v2 v2.1.0 h1:JIOH55/0cWyOuilr9/qlrm0BSXldqnqwMsf35Ld67mk=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/urfave/cli/v2 v2.23.7 h1:YHDQ46s3VghFHFf1DdF+Sh7H4RqhcM+t0TmZRJx4oJY=

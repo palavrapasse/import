@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/palavrapasse/damn/pkg/entity"
+	"github.com/palavrapasse/damn/pkg/entity/query"
 )
 
 func TestCannotParseEmptyLines(t *testing.T) {
@@ -108,10 +108,10 @@ func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
 
 	panicOnErrors(err)
 
-	user := entity.User{Email: entity.Email(email)}
+	user := query.User{Email: query.Email(email)}
 	result := leak[user].Password
 
-	if result != entity.Password(p) {
+	if result != query.Password(p) {
 		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
 	}
 }
@@ -125,10 +125,10 @@ func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
 
 	panicOnErrors(err)
 
-	user := entity.User{Email: entity.Email(email)}
+	user := query.User{Email: query.Email(email)}
 	result := leak[user].Password
 
-	if result != entity.Password(p) {
+	if result != query.Password(p) {
 		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
 	}
 }

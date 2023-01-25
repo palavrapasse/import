@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/palavrapasse/damn/pkg/entity"
+	"github.com/palavrapasse/damn/pkg/entity/query"
 )
 
 const (
@@ -27,7 +27,7 @@ type PlainTextLeakParser struct {
 	FilePath string
 }
 
-func (p PlainTextLeakParser) Parse(ecb ...OnParseErrorCallback) (entity.LeakParse, []error) {
+func (p PlainTextLeakParser) Parse(ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
 	var errors []error
 
 	lines, err := getFileLines(p.FilePath)
@@ -50,49 +50,49 @@ func findSeparator(line string) (string, error) {
 		}
 	}
 
-	err := fmt.Errorf("Input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(supportedSeparators, " "))
+	err := fmt.Errorf("input incorrect. Line %v should contain a valid separator (%v)", line, strings.Join(supportedSeparators, " "))
 	return "", err
 }
 
-func lineToUserCredential(line string, separator string) (entity.User, entity.Credentials, error) {
+func lineToUserCredential(line string, separator string) (query.User, query.Credentials, error) {
 
 	if !strings.Contains(line, separator) {
-		err := fmt.Errorf("Input incorrect. Line %v should the separator (%v)", line, separator)
-		return entity.User{}, entity.Credentials{}, err
+		err := fmt.Errorf("input incorrect. Line %v should the separator (%v)", line, separator)
+		return query.User{}, query.Credentials{}, err
 	}
 
 	lineSplit := strings.Split(line, separator)
 
 	if len(lineSplit) < NumberPositions {
-		err := fmt.Errorf("Input incorrect. Line %v should contain email and password information", line)
-		return entity.User{}, entity.Credentials{}, err
+		err := fmt.Errorf("input incorrect. Line %v should contain email and password information", line)
+		return query.User{}, query.Credentials{}, err
 	}
 
 	email := string(lineSplit[EmailPosition])
-	u, err := entity.NewUser(email)
+	u, err := query.NewUser(email)
 
 	if err != nil {
-		return entity.User{}, entity.Credentials{}, err
+		return query.User{}, query.Credentials{}, err
 	}
 
 	password := string(strings.Join(lineSplit[PasswordPosition:], separator))
-	p, err := entity.NewPassword(password)
+	p, err := query.NewPassword(password)
 
 	if err != nil {
-		return entity.User{}, entity.Credentials{}, err
+		return query.User{}, query.Credentials{}, err
 	}
 
-	c := entity.NewCredentials(p)
+	c := query.NewCredentials(p)
 
 	return u, c, nil
 }
 
-func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (entity.LeakParse, []error) {
+func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
 	var errors []error
-	leak := entity.LeakParse{}
+	leak := query.LeakParse{}
 
 	if len(lines) == 0 {
-		err := fmt.Errorf("Can't process empty leak")
+		err := fmt.Errorf("can't process empty leak")
 
 		processOnParseError(err, ecb...)
 		errors = append(errors, err)
@@ -110,8 +110,8 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (entity.LeakP
 	}
 
 	for _, line := range lines {
-		var user entity.User
-		var credentials entity.Credentials
+		var user query.User
+		var credentials query.Credentials
 
 		user, credentials, err = lineToUserCredential(line, separator)
 

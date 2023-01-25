@@ -7,21 +7,25 @@ import (
 	"strings"
 
 	"github.com/palavrapasse/damn/pkg/entity"
+	"github.com/palavrapasse/damn/pkg/entity/query"
 	"github.com/palavrapasse/import/internal/logging"
 	"github.com/palavrapasse/import/internal/parser"
 	"github.com/urfave/cli/v2"
 )
 
-func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, storeImport func(databasePath string, i entity.Import) error) func(cCtx *cli.Context) error {
+func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, notifyNewLeakURL *string, storeImport func(databasePath string, i query.Import) (entity.AutoGenKey, error), notifyImport func(entity.AutoGenKey, string) error) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		logging.Aspirador.Info("Starting Import")
 
 		var errors []error
 
-		err := validateFilePath(*leakPath, FlagLeakPath)
+		err := validateNonEmptyValue(*leakPath, FlagLeakPath)
 		errors = appendValidError(errors, err)
 
-		err = validateFilePath(*databasePath, FlagDatabasePath)
+		err = validateNonEmptyValue(*databasePath, FlagDatabasePath)
+		errors = appendValidError(errors, err)
+
+		err = validateNonEmptyValue(*notifyNewLeakURL, FlagNotifyNewLeakURL)
 		errors = appendValidError(errors, err)
 
 		if len(errors) != 0 {
@@ -70,44 +74,51 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 		leakBadActors, err := createBadActors(leakersSlice)
 		errors = appendValidError(errors, err)
 
-		shareDateFormat := shareDate.Value().Format(entity.DateFormatLayout)
-		sharedatesc, err := entity.NewDateInSeconds(shareDateFormat)
+		shareDateFormat := shareDate.Value().Format(query.DateFormatLayout)
+		sharedatesc, err := query.NewDateInSeconds(shareDateFormat)
 		errors = appendValidError(errors, err)
 
 		if len(errors) != 0 {
 			return errors[0]
 		}
 
-		leak, err := entity.NewLeak(*context, sharedatesc)
+		leak, err := query.NewLeak(*context, sharedatesc)
 		errors = appendValidError(errors, err)
 
 		if len(errors) != 0 {
 			return errors[0]
 		}
 
-		i := entity.Import{
+		i := query.Import{
 			Leak:              leak,
 			AffectedUsers:     leakParse,
 			AffectedPlatforms: leakPlatforms,
 			Leakers:           leakBadActors,
 		}
 
-		err = storeImport(*databasePath, i)
+		leakId, errImport := storeImport(*databasePath, i)
+
+		if errImport != nil {
+			return errImport
+		}
+
+		logging.Aspirador.Info("Successful Import")
+
+		err = notifyImport(leakId, *notifyNewLeakURL)
 
 		if err != nil {
 			return err
 		}
 
-		logging.Aspirador.Info("Successful Import")
 		return nil
 	}
 }
 
-func createPlatforms(platforms []string) ([]entity.Platform, error) {
-	var list []entity.Platform
+func createPlatforms(platforms []string) ([]query.Platform, error) {
+	var list []query.Platform
 
 	for _, v := range platforms {
-		platform, err := entity.NewPlatform(v)
+		platform, err := query.NewPlatform(v)
 
 		if err != nil {
 			return list, err
@@ -119,11 +130,11 @@ func createPlatforms(platforms []string) ([]entity.Platform, error) {
 	return list, nil
 }
 
-func createBadActors(leakers []string) ([]entity.BadActor, error) {
-	var list []entity.BadActor
+func createBadActors(leakers []string) ([]query.BadActor, error) {
+	var list []query.BadActor
 
 	for _, v := range leakers {
-		badActor, err := entity.NewBadActor(v)
+		badActor, err := query.NewBadActor(v)
 
 		if err != nil {
 			return list, err
@@ -135,7 +146,7 @@ func createBadActors(leakers []string) ([]entity.BadActor, error) {
 	return list, nil
 }
 
-func validateFilePath(value string, flag string) error {
+func validateNonEmptyValue(value string, flag string) error {
 	if len(strings.TrimSpace(value)) == 0 {
 		return fmt.Errorf("%s should not be empty or only white spaces", flag)
 	}

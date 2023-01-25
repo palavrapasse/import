@@ -1,20 +1,21 @@
 package cli
 
 import (
-	"github.com/palavrapasse/damn/pkg/entity"
+	"github.com/palavrapasse/damn/pkg/entity/query"
 	"github.com/urfave/cli/v2"
 )
 
 const (
-	FlagDatabasePath  = "database-path"
-	FlagLeakPath      = "leak-path"
-	FlagLeakContext   = "context"
-	FlagLeakPlatforms = "platforms"
-	FlagLeakShareDate = "share-date"
-	FlagLeakers       = "leakers"
+	FlagDatabasePath     = "database-path"
+	FlagLeakPath         = "leak-path"
+	FlagLeakContext      = "context"
+	FlagLeakPlatforms    = "platforms"
+	FlagLeakShareDate    = "share-date"
+	FlagLeakers          = "leakers"
+	FlagNotifyNewLeakURL = "notify url"
 )
 
-func CreateCliFlags(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice) []cli.Flag {
+func CreateCliFlags(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, notifyNewLeakURL *string) []cli.Flag {
 
 	return []cli.Flag{
 		&cli.PathFlag{
@@ -50,7 +51,7 @@ func CreateCliFlags(databasePath *string, leakPath *string, context *string, pla
 			Name:        FlagLeakShareDate,
 			Aliases:     AliasesFlagLeakShareDate,
 			Usage:       "Leak Share Date",
-			Layout:      entity.DateFormatLayout,
+			Layout:      query.DateFormatLayout,
 			Required:    true,
 			Destination: shareDate,
 		},
@@ -60,6 +61,13 @@ func CreateCliFlags(databasePath *string, leakPath *string, context *string, pla
 			Usage:       "Leakers (separated by commas)",
 			Required:    true,
 			Destination: leakers,
+		},
+		&cli.StringFlag{
+			Name:        FlagNotifyNewLeakURL,
+			Aliases:     AliasesFlagNotifyNewLeakURL,
+			Usage:       "URL service to be notified of the new leak",
+			Required:    true,
+			Destination: notifyNewLeakURL,
 		},
 	}
 }
