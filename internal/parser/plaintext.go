@@ -3,8 +3,10 @@ package parser
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/palavrapasse/damn/pkg/entity/query"
 )
@@ -20,6 +22,8 @@ const (
 	ColonSeparator     = ":"
 	SemiColonSeparator = ";"
 )
+
+const MaxLinesOfGoroutine = 5000
 
 var supportedSeparators = []string{ColonSeparator, CommaSeparator, SemiColonSeparator}
 
@@ -88,7 +92,10 @@ func lineToUserCredential(line string, separator string) (query.User, query.Cred
 }
 
 func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
+	errorsMapMutex := sync.RWMutex{}
 	var errors []error
+
+	leakMapMutex := sync.RWMutex{}
 	leak := query.LeakParse{}
 
 	if len(lines) == 0 {
@@ -109,19 +116,51 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 		return leak, errors
 	}
 
-	for _, line := range lines {
-		var user query.User
-		var credentials query.Credentials
+	nlines := len(lines)
 
-		user, credentials, err = lineToUserCredential(line, separator)
-
-		if err == nil {
-			leak[user] = credentials
-		} else {
-			processOnParseError(err, ecb...)
-			errors = append(errors, err)
-		}
+	ngoroutines := 1
+	if nlines > MaxLinesOfGoroutine {
+		ngoroutines = int(math.Ceil(float64(nlines) / float64(MaxLinesOfGoroutine)))
 	}
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < ngoroutines; i++ {
+		wg.Add(1)
+
+		init := i * MaxLinesOfGoroutine
+		end := (i + 1) * MaxLinesOfGoroutine
+		if end > nlines {
+			end = nlines
+		}
+
+		go func(init int, end int, routine int) {
+
+			for nline := init; nline < end; nline++ {
+				line := lines[nline]
+
+				var user query.User
+				var credentials query.Credentials
+
+				user, credentials, err = lineToUserCredential(line, separator)
+
+				if err == nil {
+					leakMapMutex.Lock()
+					leak[user] = credentials
+					leakMapMutex.Unlock()
+				} else {
+					processOnParseError(err, ecb...)
+					errorsMapMutex.Lock()
+					errors = append(errors, err)
+					errorsMapMutex.Unlock()
+				}
+			}
+			wg.Done()
+
+		}(init, end, i)
+	}
+
+	wg.Wait()
 
 	return leak, errors
 }
