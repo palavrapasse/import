@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/palavrapasse/damn/pkg/entity"
 	"github.com/palavrapasse/import/internal/logging"
 )
 
 const MaxAttemptsNotify = 5
+const WaitingSecondsBetweenAttemptsNotify = 3
 
 func NotifyNewLeak(leakId entity.AutoGenKey, subscribeServiceURL string) error {
 	logging.Aspirador.Info(fmt.Sprintf("Starting notification of new leak %d", leakId))
@@ -39,8 +41,10 @@ func NotifyNewLeak(leakId entity.AutoGenKey, subscribeServiceURL string) error {
 			logging.Aspirador.Warning(fmt.Sprintf("Expected %d status but received %d status. Trying again (done %d attempts)", http.StatusNoContent, resp.StatusCode, attempt))
 		}
 
-		attempt++
+		logging.Aspirador.Trace(fmt.Sprintf("Waiting %d seconds...", WaitingSecondsBetweenAttemptsNotify))
+		time.Sleep(WaitingSecondsBetweenAttemptsNotify * time.Second)
 
+		attempt++
 	}
 
 	defer func() {
