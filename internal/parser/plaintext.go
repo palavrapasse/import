@@ -130,6 +130,8 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 
 	var wg sync.WaitGroup
 
+	wg.Add(ngoroutines)
+
 	for i := 0; i < ngoroutines; i++ {
 
 		init := i * MaxLinesOfGoroutine
@@ -138,12 +140,10 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 			end = nlines
 		}
 
-		wg.Add(1)
-
-		go func(slice []string) {
+		go func(lines []string) {
 
 			defer wg.Done()
-			linesParseResultChan <- linesToLeakParseRoutine(slice, separator)
+			linesParseResultChan <- routineLinesToLeakParse(lines, separator)
 
 		}(lines[init:end])
 	}
@@ -161,11 +161,11 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 	return leak, errors
 }
 
-func linesToLeakParseRoutine(slice []string, separator string, ecb ...OnParseErrorCallback) linesParseResult {
+func routineLinesToLeakParse(lines []string, separator string, ecb ...OnParseErrorCallback) linesParseResult {
 	leak := query.LeakParse{}
 	var errors []error
 
-	for _, line := range slice {
+	for _, line := range lines {
 
 		user, credentials, err := lineToUserCredential(line, separator)
 
