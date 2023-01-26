@@ -13,6 +13,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+const MaxErrorLogCalls = 20000
+
 func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, notifyNewLeakURL *string, storeImport func(databasePath string, i query.Import) (entity.AutoGenKey, error), notifyImport func(entity.AutoGenKey, string) error) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		logging.Aspirador.Info("Starting Import")
@@ -39,11 +41,16 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 		leakParse, errParse := parser.Parse()
 
 		if errParse != nil {
+			errorsCount := len(errParse)
 
-			logging.Aspirador.Warning("Found the following errors parsing leak:")
+			if errorsCount > MaxErrorLogCalls {
+				logging.Aspirador.Warning(fmt.Sprintf("Found a lot of error during leak parse (%d)...", errorsCount))
+			} else {
+				logging.Aspirador.Warning("Found the following errors parsing leak:")
 
-			for _, v := range errParse {
-				logging.Aspirador.Warning(v.Error())
+				for _, v := range errParse {
+					logging.Aspirador.Warning(v.Error())
+				}
 			}
 
 			fmt.Println("Proceed with import?")

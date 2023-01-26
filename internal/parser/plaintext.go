@@ -3,10 +3,13 @@ package parser
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/palavrapasse/damn/pkg/entity/query"
+	"golang.org/x/exp/maps"
 )
 
 const (
@@ -21,10 +24,17 @@ const (
 	SemiColonSeparator = ";"
 )
 
+const MaxLinesOfGoroutine = 5000
+
 var supportedSeparators = []string{ColonSeparator, CommaSeparator, SemiColonSeparator}
 
 type PlainTextLeakParser struct {
 	FilePath string
+}
+
+type linesParseResult struct {
+	query.LeakParse
+	errors []error
 }
 
 func (p PlainTextLeakParser) Parse(ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
@@ -109,11 +119,55 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 		return leak, errors
 	}
 
-	for _, line := range lines {
-		var user query.User
-		var credentials query.Credentials
+	nlines := len(lines)
 
-		user, credentials, err = lineToUserCredential(line, separator)
+	ngoroutines := 1
+	if nlines > MaxLinesOfGoroutine {
+		ngoroutines = int(math.Ceil(float64(nlines) / float64(MaxLinesOfGoroutine)))
+	}
+
+	linesParseResultChan := make(chan linesParseResult)
+
+	var wg sync.WaitGroup
+
+	wg.Add(ngoroutines)
+
+	for i := 0; i < ngoroutines; i++ {
+
+		init := i * MaxLinesOfGoroutine
+		end := (i + 1) * MaxLinesOfGoroutine
+		if end > nlines {
+			end = nlines
+		}
+
+		go func(lines []string) {
+
+			defer wg.Done()
+			linesParseResultChan <- routineLinesToLeakParse(lines, separator)
+
+		}(lines[init:end])
+	}
+
+	go func() {
+		wg.Wait()
+		close(linesParseResultChan)
+	}()
+
+	for s := range linesParseResultChan {
+		errors = append(errors, s.errors...)
+		maps.Copy(leak, s.LeakParse)
+	}
+
+	return leak, errors
+}
+
+func routineLinesToLeakParse(lines []string, separator string, ecb ...OnParseErrorCallback) linesParseResult {
+	leak := query.LeakParse{}
+	var errors []error
+
+	for _, line := range lines {
+
+		user, credentials, err := lineToUserCredential(line, separator)
 
 		if err == nil {
 			leak[user] = credentials
@@ -123,7 +177,10 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 		}
 	}
 
-	return leak, errors
+	return linesParseResult{
+		LeakParse: leak,
+		errors:    errors,
+	}
 }
 
 func getFileLines(filePath string) ([]string, error) {
