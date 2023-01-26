@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/palavrapasse/damn/pkg/entity/query"
+	"golang.org/x/exp/maps"
 )
 
 const (
@@ -29,6 +30,11 @@ var supportedSeparators = []string{ColonSeparator, CommaSeparator, SemiColonSepa
 
 type PlainTextLeakParser struct {
 	FilePath string
+}
+
+type linesParseResult struct {
+	query.LeakParse
+	errors []error
 }
 
 func (p PlainTextLeakParser) Parse(ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
@@ -92,10 +98,7 @@ func lineToUserCredential(line string, separator string) (query.User, query.Cred
 }
 
 func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
-	errorsMapMutex := sync.RWMutex{}
 	var errors []error
-
-	leakMapMutex := sync.RWMutex{}
 	leak := query.LeakParse{}
 
 	if len(lines) == 0 {
@@ -123,10 +126,11 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 		ngoroutines = int(math.Ceil(float64(nlines) / float64(MaxLinesOfGoroutine)))
 	}
 
+	linesParseResultChan := make(chan linesParseResult)
+
 	var wg sync.WaitGroup
 
 	for i := 0; i < ngoroutines; i++ {
-		wg.Add(1)
 
 		init := i * MaxLinesOfGoroutine
 		end := (i + 1) * MaxLinesOfGoroutine
@@ -134,35 +138,49 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 			end = nlines
 		}
 
-		go func(init int, end int, routine int) {
+		wg.Add(1)
 
-			for nline := init; nline < end; nline++ {
-				line := lines[nline]
+		go func(slice []string) {
 
-				var user query.User
-				var credentials query.Credentials
+			defer wg.Done()
+			linesParseResultChan <- linesToLeakParseRoutine(slice, separator)
 
-				user, credentials, err = lineToUserCredential(line, separator)
-
-				if err == nil {
-					leakMapMutex.Lock()
-					leak[user] = credentials
-					leakMapMutex.Unlock()
-				} else {
-					processOnParseError(err, ecb...)
-					errorsMapMutex.Lock()
-					errors = append(errors, err)
-					errorsMapMutex.Unlock()
-				}
-			}
-			wg.Done()
-
-		}(init, end, i)
+		}(lines[init:end])
 	}
 
-	wg.Wait()
+	go func() {
+		wg.Wait()
+		close(linesParseResultChan)
+	}()
+
+	for s := range linesParseResultChan {
+		errors = append(errors, s.errors...)
+		maps.Copy(leak, s.LeakParse)
+	}
 
 	return leak, errors
+}
+
+func linesToLeakParseRoutine(slice []string, separator string, ecb ...OnParseErrorCallback) linesParseResult {
+	leak := query.LeakParse{}
+	var errors []error
+
+	for _, line := range slice {
+
+		user, credentials, err := lineToUserCredential(line, separator)
+
+		if err == nil {
+			leak[user] = credentials
+		} else {
+			processOnParseError(err, ecb...)
+			errors = append(errors, err)
+		}
+	}
+
+	return linesParseResult{
+		LeakParse: leak,
+		errors:    errors,
+	}
 }
 
 func getFileLines(filePath string) ([]string, error) {
