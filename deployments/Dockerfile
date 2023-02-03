@@ -5,6 +5,7 @@ RUN --mount=type=secret,id=git-credentials cp /run/secrets/git-credentials ~/.gi
 
 # todo: remove this after repositories are public (+ git-credentials)
 RUN apk add git
+RUN apk add gcc g++
 RUN git config --global credential.helper store
 
 COPY go.mod ./
@@ -14,7 +15,7 @@ RUN go mod download
 
 COPY internal/ ./internal/
 
-RUN GOOS=linux CGO_ENABLED=0 go build -o import ./main.go
+RUN GOOS=linux CGO_ENABLED=1 go build -ldflags="-extldflags=-static" -o import ./main.go
 
 FROM scratch
 WORKDIR /app
