@@ -14,6 +14,7 @@ COPY go.sum ./
 RUN go mod download
 
 COPY internal/ ./internal/
+COPY main.go ./main.go
 
 RUN GOOS=linux CGO_ENABLED=1 go build -ldflags="-extldflags=-static" -o import ./main.go
 
