@@ -23,4 +23,5 @@ WORKDIR /app
 
 COPY --from=builder /app /app/
 
-CMD [ "/app/import" ]
+ENTRYPOINT ["/app/import"]
+CMD [ "--help" ]
