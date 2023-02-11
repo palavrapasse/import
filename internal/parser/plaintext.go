@@ -78,12 +78,14 @@ func lineToUserCredential(line string, separator string) (query.User, query.Cred
 		return query.User{}, query.Credentials{}, err
 	}
 
-	email := string(lineSplit[EmailPosition])
-	u, err := query.NewUser(email)
+	emailString := string(lineSplit[EmailPosition])
+	email, err := query.NewEmail(emailString)
 
 	if err != nil {
 		return query.User{}, query.Credentials{}, err
 	}
+
+	u := query.NewUser(email)
 
 	password := string(strings.Join(lineSplit[PasswordPosition:], separator))
 	p, err := query.NewPassword(password)
