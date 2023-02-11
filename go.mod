@@ -3,10 +3,10 @@ module github.com/palavrapasse/import
 go 1.19
 
 require (
-	github.com/palavrapasse/aspirador v0.0.1
-	github.com/palavrapasse/damn v0.0.8
-	github.com/urfave/cli/v2 v2.23.7
-	golang.org/x/exp v0.0.0-20230126173853-a67bb567ff2e
+	github.com/palavrapasse/aspirador v0.0.2
+	github.com/palavrapasse/damn v0.0.9
+	github.com/urfave/cli/v2 v2.24.3
+	golang.org/x/exp v0.0.0-20230210204819-062eb4c674ab
 )
 
 require (
