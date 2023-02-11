@@ -6,7 +6,7 @@ require (
 	github.com/palavrapasse/aspirador v0.0.2
 	github.com/palavrapasse/damn v0.0.9
 	github.com/urfave/cli/v2 v2.24.3
-	golang.org/x/exp v0.0.0-20230126173853-a67bb567ff2e
+	golang.org/x/exp v0.0.0-20230210204819-062eb4c674ab
 )
 
 require (
