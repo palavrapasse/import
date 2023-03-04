@@ -1,0 +1,19 @@
+{
+  "name": "import-web-api",
+  "version": "0.0.1",
+  "description": "API server that receives form requests and triggers leak import",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/palavrapasse/import.git"
+  },
+  "author": "palavrapasse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/palavrapasse/import/issues"
+  },
+  "homepage": "https://github.com/palavrapasse/import#readme"
+}
