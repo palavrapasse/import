@@ -21,7 +21,7 @@
 	<ShareDate bind:value={form.shareDateMS} />
 	<Platforms bind:value={form.platforms} />
 	<Leakers bind:value={form.leakers} />
-	<LeakFile bind:value={form.leakFilePath} />
+	<LeakFile bind:value={form.leakFile} />
 
 	<SubmitButton />
 </form>

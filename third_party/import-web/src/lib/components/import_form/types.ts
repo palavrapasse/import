@@ -1,6 +1,6 @@
 export type Form = {
     context: string;
-    leakFilePath: string;
+    leakFile: File;
     shareDateMS: number;
     leakers: Array<string>;
     platforms: Array<string>;
