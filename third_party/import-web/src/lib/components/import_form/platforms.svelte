@@ -4,11 +4,18 @@
 
 	$: {
 		const trimmed = innerValue.replaceAll(/\\s+|,*/g, '');
+		let currentIndex = value.length - 1;
+
+		if (currentIndex < 0) {
+			currentIndex = 0;
+		}
 
 		if (trimmed.length > 1 && innerValue.endsWith(',')) {
-			value.push(trimmed);
 			innerValue = '';
+			currentIndex++;
 		}
+
+		value[currentIndex] = innerValue;
 	}
 </script>
 
