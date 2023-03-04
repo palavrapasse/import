@@ -1,29 +1,12 @@
 <script lang="ts">
-	export const value = new Array<string>();
-	let innerValue = '';
+	import SeparatedInputForm from './separated_input_form.svelte';
 
-	$: {
-		const trimmed = innerValue.replaceAll(/\\s+|,*/g, '');
-		let currentIndex = value.length - 1;
-
-		if (currentIndex < 0) {
-			currentIndex = 0;
-		}
-
-		if (trimmed.length > 1 && innerValue.endsWith(',')) {
-			innerValue = '';
-			currentIndex++;
-		}
-
-		value[currentIndex] = innerValue;
-	}
+	export let value = new Array<string>();
 </script>
 
-<label for="import-form-platforms">Platforms (use "," to include more than one platform)</label>
-<input
-	class="input input-primary input-sm"
-	type="text"
-	name="leak platforms"
+<SeparatedInputForm
 	id="import-form-platforms"
-	bind:value={innerValue}
+	label="Platforms (use ',' to include more than one platform)"
+	name="leak platforms"
+	bind:value
 />

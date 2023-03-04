@@ -1,29 +1,12 @@
 <script lang="ts">
-	export const value = new Array<string>();
-	let innerValue = '';
+	import SeparatedInputForm from './separated_input_form.svelte';
 
-	$: {
-		const trimmed = innerValue.replaceAll(/\\s+|,*/g, '');
-		let currentIndex = value.length - 1;
-
-		if (currentIndex < 0) {
-			currentIndex = 0;
-		}
-
-		if (trimmed.length > 1 && innerValue.endsWith(',')) {
-			innerValue = '';
-			currentIndex++;
-		}
-
-		value[currentIndex] = innerValue;
-	}
+	export let value = new Array<string>();
 </script>
 
-<label for="import-form-leakers">Leakers (use "," to include more than one leaker)</label>
-<input
-	class="input input-primary input-sm"
-	type="text"
-	name="leak bad actors"
+<SeparatedInputForm
 	id="import-form-leakers"
-	bind:value={innerValue}
+	label="Leakers (use ',' to include more than one leaker)"
+	name="leak bad actors"
+	bind:value
 />
