@@ -20,4 +20,10 @@
 </script>
 
 <label for="import-form-platforms">Platforms (use "," to include more than one platform)</label>
-<input type="text" name="leak platforms" id="import-form-platforms" bind:value={innerValue} />
+<input
+	class="input input-primary input-sm"
+	type="text"
+	name="leak platforms"
+	id="import-form-platforms"
+	bind:value={innerValue}
+/>

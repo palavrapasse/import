@@ -20,4 +20,10 @@
 </script>
 
 <label for="import-form-leakers">Leakers (use "," to include more than one leaker)</label>
-<input type="text" name="leak bad actors" id="import-form-leakers" bind:value={innerValue} />
+<input
+	class="input input-primary input-sm"
+	type="text"
+	name="leak bad actors"
+	id="import-form-leakers"
+	bind:value={innerValue}
+/>

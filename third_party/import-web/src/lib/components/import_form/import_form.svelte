@@ -16,7 +16,7 @@
 	}
 </script>
 
-<form on:submit|preventDefault={submitForm} action=".">
+<form class="flex flex-col gap-2" on:submit|preventDefault={submitForm} action=".">
 	<Context bind:value={form.context} />
 	<ShareDate bind:value={form.shareDateMS} />
 	<Platforms bind:value={form.platforms} />

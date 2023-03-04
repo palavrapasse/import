@@ -1,1 +1,1 @@
-<button type="submit">Submit</button>
+<button class="btn btn-outline-primary" type="submit">Submit</button>

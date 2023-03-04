@@ -6,4 +6,10 @@
 </script>
 
 <label for="import-form-share-date">Share date (defaults to 01-01-1970/UNKNOWN)</label>
-<input type="date" name="leak share date" id="import-form-share-date" bind:value={innerValue} />
+<input
+	class="input input-primary input-sm"
+	type="date"
+	name="leak share date"
+	id="import-form-share-date"
+	bind:value={innerValue}
+/>
