@@ -23,10 +23,14 @@ const leakFormSchema = {
 };
 
 function triggerImportLeak(leakForm) {
-    const cmd = `import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}`;
+    const cmd = `./import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}" --notify-url="https://subscribeService/notify"`;
     console.info(cmd);
 
-    exec(cmd);
+    exec(cmd, function (error, stdout, stderr) {
+        console.log(`error!: ${error}`);
+        console.log(`stdout!: ${stdout}`);
+        console.log(`stderr!: ${stderr}`);
+    });
 }
 
 const server = http.createServer(function (req, res) {
@@ -38,14 +42,19 @@ const server = http.createServer(function (req, res) {
                 const leakForm = Object.assign({}, leakFormSchema);
 
                 leakForm.context = `${fields.context[0]}`;
-                leakForm.shareDate = new Date(Number.parseInt(`${fields.shareDateMS[0]}`)).toISOString();
-                leakForm.platforms = `${fields.platforms[0]}`.split(',');
-                leakForm.leakers = `${fields.leakers[0]}`.split(',');
-                leakForm.leakFile = files.leakFile[0].path;
 
-                console.info(`triggering leak import with the following data: ${leakForm}`);
+                try {
+                    leakForm.shareDate = new Date(Number.parseInt(`${fields.shareDateMS[0]}`)).toISOString().split('T')[0];
+                    leakForm.platforms = `${fields.platforms[0]}`.split(',');
+                    leakForm.leakers = `${fields.leakers[0]}`.split(',');
+                    leakForm.leakFile = files.leakFile[0].path;
 
-                triggerImportLeak(leakForm);
+                    console.info(`triggering leak import with the following data: ${JSON.stringify(leakForm)}`);
+
+                    triggerImportLeak(leakForm);
+                } catch (err) {
+                    console.error(`something went wrong!error: ${err}`);
+                }
             } else {
                 console.error(err);
             }
