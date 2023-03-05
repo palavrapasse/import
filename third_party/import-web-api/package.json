@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "description": "API server that receives form requests and triggers leak import",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/palavrapasse/import/issues"
   },
-  "homepage": "https://github.com/palavrapasse/import#readme"
+  "homepage": "https://github.com/palavrapasse/import#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "multiparty": "^4.2.3"
+  }
 }
