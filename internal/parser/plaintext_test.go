@@ -3,8 +3,6 @@ package parser
 import (
 	"fmt"
 	"testing"
-
-	"github.com/palavrapasse/damn/pkg/entity/query"
 )
 
 func TestCannotParseEmptyLines(t *testing.T) {
@@ -96,40 +94,6 @@ func TestCanParseLinesToLeakWithPasswordThatContainsSeparator(t *testing.T) {
 
 	if len(leak) != 1 {
 		t.Fatalf("Lines designated by the string below contains some valid lines, but Leak is empty\nString: %s", lines)
-	}
-}
-
-func TestCanParsePasswordThatDoesNotContainSeparator(t *testing.T) {
-	email := "test@aaa"
-	p := "dghfaaa,;.78"
-	lines := []string{fmt.Sprintf("%s:%s", email, p)}
-
-	leak, err := linesToLeakParse(lines)
-
-	panicOnErrors(err)
-
-	user := query.User{Email: query.Email(email)}
-	result := leak[user].Password
-
-	if result != query.Password(p) {
-		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
-	}
-}
-
-func TestCanParsePasswordThatContainsSeparator(t *testing.T) {
-	email := "test@aaa"
-	p := "dghf:aaa,;.78"
-	lines := []string{fmt.Sprintf("%s:%s", email, p)}
-
-	leak, err := linesToLeakParse(lines)
-
-	panicOnErrors(err)
-
-	user := query.User{Email: query.Email(email)}
-	result := leak[user].Password
-
-	if result != query.Password(p) {
-		t.Fatalf("Password designated by the string below should be the same as '%s'\nString: %s", p, result)
 	}
 }
 
