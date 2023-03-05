@@ -1,6 +1,6 @@
 import type { Form } from "@components";
 
-const importWebApiUrl = 'http://localhost:55545';
+const importWebApiUrl = 'http://0.0.0.0:55545';
 
 export default function (form: Form): Promise<Response> {
     const formData = new FormData();
