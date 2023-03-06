@@ -7,6 +7,7 @@ import (
 var Aspirador as.Aspirador
 
 func CreateAspiradorClients() []as.Client {
-	consoleClient := as.NewConsoleClient()
-	return []as.Client{&consoleClient}
+	cc := as.NewConsoleClient()
+
+	return []as.Client{&cc}
 }
