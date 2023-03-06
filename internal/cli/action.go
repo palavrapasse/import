@@ -44,7 +44,7 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 			errorsCount := len(errParse)
 
 			if errorsCount > MaxErrorLogCalls {
-				logging.Aspirador.Warning(fmt.Sprintf("Found a lot of error during leak parse (%d)...", errorsCount))
+				logging.Aspirador.Warning(fmt.Sprintf("Found a lot of errors during leak parse (%d)...", errorsCount))
 			} else {
 				logging.Aspirador.Warning("Found the following errors parsing leak:")
 
@@ -109,7 +109,7 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 			return errImport
 		}
 
-		logging.Aspirador.Info("Successful Import")
+		logging.Aspirador.Info(fmt.Sprintf("Successful Import (%d)", len(leakParse)))
 
 		err = notifyImport(leakId, *notifyNewLeakURL)
 
