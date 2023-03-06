@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/palavrapasse/damn/pkg/entity/query"
-	"golang.org/x/exp/maps"
 )
 
 const (
@@ -64,39 +63,37 @@ func findSeparator(line string) (string, error) {
 	return "", err
 }
 
-func lineToUserCredential(line string, separator string) (query.User, query.Credentials, error) {
+func lineToUser(line string, separator string) (query.User, error) {
 
 	if !strings.Contains(line, separator) {
 		err := fmt.Errorf("input incorrect. Line %v should the separator (%v)", line, separator)
-		return query.User{}, query.Credentials{}, err
+		return query.User{}, err
 	}
 
 	lineSplit := strings.Split(line, separator)
 
 	if len(lineSplit) < NumberPositions {
 		err := fmt.Errorf("input incorrect. Line %v should contain email and password information", line)
-		return query.User{}, query.Credentials{}, err
+		return query.User{}, err
 	}
 
 	emailString := string(lineSplit[EmailPosition])
 	email, err := query.NewEmail(emailString)
 
 	if err != nil {
-		return query.User{}, query.Credentials{}, err
+		return query.User{}, err
 	}
 
 	u := query.NewUser(email)
 
 	password := string(strings.Join(lineSplit[PasswordPosition:], separator))
-	p, err := query.NewPassword(password)
+	_, err = query.NewPassword(password)
 
 	if err != nil {
-		return query.User{}, query.Credentials{}, err
+		return query.User{}, err
 	}
 
-	c := query.NewCredentials(p)
-
-	return u, c, nil
+	return u, nil
 }
 
 func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakParse, []error) {
@@ -157,7 +154,7 @@ func linesToLeakParse(lines []string, ecb ...OnParseErrorCallback) (query.LeakPa
 
 	for s := range linesParseResultChan {
 		errors = append(errors, s.errors...)
-		maps.Copy(leak, s.LeakParse)
+		leak = append(leak, s.LeakParse...)
 	}
 
 	return leak, errors
@@ -169,10 +166,10 @@ func routineLinesToLeakParse(lines []string, separator string, ecb ...OnParseErr
 
 	for _, line := range lines {
 
-		user, credentials, err := lineToUserCredential(line, separator)
+		user, err := lineToUser(line, separator)
 
 		if err == nil {
-			leak[user] = credentials
+			leak = append(leak, user)
 		} else {
 			processOnParseError(err, ecb...)
 			errors = append(errors, err)

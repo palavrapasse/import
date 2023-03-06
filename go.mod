@@ -4,9 +4,8 @@ go 1.19
 
 require (
 	github.com/palavrapasse/aspirador v0.0.5
-	github.com/palavrapasse/damn v0.0.9
+	github.com/palavrapasse/damn v0.0.10
 	github.com/urfave/cli/v2 v2.24.4
-	golang.org/x/exp v0.0.0-20230210204819-062eb4c674ab
 )
 
 require (
