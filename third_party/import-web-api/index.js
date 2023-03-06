@@ -8,6 +8,7 @@ dotenv.config();
 const host = process.env.server_host;
 const port = process.env.server_port;
 const leaksDbFilePath = process.env.leaksdb_fp;
+const subscribeNotifyUrl = process.env.subscribe_notify_url;
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -23,7 +24,7 @@ const leakFormSchema = {
 };
 
 function triggerImportLeak(leakForm) {
-    const cmd = `./import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}" --notify-url="https://subscribeService/notify"`;
+    const cmd = `./import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}" --notify-url="${subscribeNotifyUrl}"`;
     console.info(cmd);
 
     exec(cmd, function (error, stdout, stderr) {
