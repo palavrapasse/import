@@ -6,16 +6,20 @@ import (
 )
 
 const (
-	FlagDatabasePath     = "database-path"
-	FlagLeakPath         = "leak-path"
-	FlagLeakContext      = "context"
-	FlagLeakPlatforms    = "platforms"
-	FlagLeakShareDate    = "share-date"
-	FlagLeakers          = "leakers"
-	FlagNotifyNewLeakURL = "notify url"
+	FlagDatabasePath        = "database-path"
+	FlagLeakPath            = "leak-path"
+	FlagLeakContext         = "context"
+	FlagLeakPlatforms       = "platforms"
+	FlagLeakShareDate       = "share-date"
+	FlagLeakers             = "leakers"
+	FlagNotifyNewLeakURL    = "notify url"
+	FlagSkipInteractiveMode = "skip-interactive-mode"
 )
 
-func CreateCliFlags(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, notifyNewLeakURL *string) []cli.Flag {
+func CreateCliFlags(databasePath *string, leakPath *string, context *string,
+	platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice,
+	notifyNewLeakURL *string, skipInteractiveMode *bool,
+) []cli.Flag {
 
 	return []cli.Flag{
 		&cli.PathFlag{
@@ -68,6 +72,14 @@ func CreateCliFlags(databasePath *string, leakPath *string, context *string, pla
 			Usage:       "URL service to be notified of the new leak",
 			Required:    true,
 			Destination: notifyNewLeakURL,
+		},
+		&cli.BoolFlag{
+			Name:        FlagSkipInteractiveMode,
+			Aliases:     AliasesFlagSkipInteractiveMode,
+			Usage:       "Whether to skip questions the program might question you before taking any action",
+			Required:    false,
+			Value:       false,
+			Destination: skipInteractiveMode,
 		},
 	}
 }
