@@ -15,7 +15,11 @@ import (
 
 const MaxErrorLogCalls = 20000
 
-func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice, shareDate *cli.Timestamp, leakers *cli.StringSlice, notifyNewLeakURL *string, storeImport func(databasePath string, i query.Import) (entity.AutoGenKey, error), notifyImport func(entity.AutoGenKey, string) error) func(cCtx *cli.Context) error {
+func CreateAction(databasePath *string, leakPath *string, context *string, platforms *cli.StringSlice,
+	shareDate *cli.Timestamp, leakers *cli.StringSlice, notifyNewLeakURL *string, skipInteractiveMode *bool,
+	storeImport func(databasePath string, i query.Import) (entity.AutoGenKey, error),
+	notifyImport func(entity.AutoGenKey, string) error,
+) func(cCtx *cli.Context) error {
 	return func(cCtx *cli.Context) error {
 		logging.Aspirador.Info("Starting Import")
 
@@ -53,17 +57,19 @@ func CreateAction(databasePath *string, leakPath *string, context *string, platf
 				}
 			}
 
-			fmt.Println("Proceed with import?")
-			reader := bufio.NewReader(os.Stdin)
-			input, _, errRead := reader.ReadLine()
+			if !*skipInteractiveMode {
+				fmt.Println("Proceed with import?")
+				reader := bufio.NewReader(os.Stdin)
+				input, _, errRead := reader.ReadLine()
 
-			if errRead != nil {
-				return errRead
-			}
+				if errRead != nil {
+					return errRead
+				}
 
-			if !IsProceedAnswer(proceedAnswers, strings.ToLower(string(input))) {
-				logging.Aspirador.Info("Stopped import")
-				return nil
+				if !IsProceedAnswer(proceedAnswers, strings.ToLower(string(input))) {
+					logging.Aspirador.Info("Stopped import")
+					return nil
+				}
 			}
 		}
 

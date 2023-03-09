@@ -19,6 +19,7 @@ func CreateCliApp(storeImport func(databasePath string, i query.Import) (entity.
 	var shareDate cli.Timestamp
 	var leakers cli.StringSlice
 	var notifyNewLeakURL string
+	var skipInteractiveMode bool
 
 	app := &cli.App{
 		Name:                 "import",
@@ -30,8 +31,8 @@ func CreateCliApp(storeImport func(databasePath string, i query.Import) (entity.
 		HideHelp:             false,
 		HideVersion:          false,
 		Authors:              CreateCliAuthors(),
-		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, &notifyNewLeakURL),
-		Action:               CreateAction(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, &notifyNewLeakURL, storeImport, notifyImport),
+		Flags:                CreateCliFlags(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, &notifyNewLeakURL, &skipInteractiveMode),
+		Action:               CreateAction(&databasePath, &leakPath, &context, &platforms, &shareDate, &leakers, &notifyNewLeakURL, &skipInteractiveMode, storeImport, notifyImport),
 	}
 
 	cli.AppHelpTemplate = CreateAppHelpTemplate(cli.AppHelpTemplate)

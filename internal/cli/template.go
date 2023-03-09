@@ -6,7 +6,7 @@ import (
 	"github.com/palavrapasse/damn/pkg/entity/query"
 )
 
-var exampleCommand = fmt.Sprintf(`./import --database-path="path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2" --notify-url="https://subscribeService/notify"`,
+var exampleCommand = fmt.Sprintf(`./import --database-path="path/db.sqlite" --leak-path="path/file.txt" --context="context" --platforms="platform1, platform2" --share-date="%s" --leakers="leaker1, leaker2" --notify-url="https://subscribeService/notify" --skip=false`,
 	query.DateFormatLayout)
 
 func CreateAppHelpTemplate(base string) string {
