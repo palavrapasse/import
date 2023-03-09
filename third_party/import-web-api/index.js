@@ -24,7 +24,7 @@ const leakFormSchema = {
 };
 
 function triggerImportLeak(leakForm) {
-    const cmd = `./import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}" --notify-url="${subscribeNotifyUrl}"`;
+    const cmd = `./import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}" --notify-url="${subscribeNotifyUrl}" --skip=true`;
     console.info(cmd);
 
     exec(cmd, function (error, stdout, stderr) {
