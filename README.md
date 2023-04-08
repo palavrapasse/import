@@ -45,7 +45,7 @@ export $(grep -v '^#' third_party/import-web-api/.env | xargs)
 
 docker run \
     -p $server_port:$server_port \
-    -v "type=bind,src=$leaksdb_fp,dst=$leaksdb_fp" \
+    --mount "type=bind,src=$leaksdb_fp,dst=$leaksdb_fp" \
     --env-file third_party/import-web-api/.env \
     -t $docker_tag
 ```
