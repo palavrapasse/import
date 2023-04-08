@@ -2,6 +2,7 @@ import http from 'http';
 import { Form } from 'multiparty';
 import { exec } from 'child_process';
 import * as dotenv from 'dotenv'
+import { statSync } from 'fs';
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ const leakFormSchema = {
     platforms: new String(),
 };
 
-function triggerImportLeak(leakForm) {
+function triggerImportLeak(leakForm, onFinish) {
     const cmd = `./import --database-path="${leaksDbFilePath}" --leak-path="${leakForm.leakFile}" --context="${leakForm.context}" --platforms="${leakForm.platforms}" --share-date="${leakForm.shareDate}" --leakers="${leakForm.leakers}" --notify-url="${subscribeNotifyUrl}" --skip=true`;
     console.info(cmd);
 
@@ -31,7 +32,13 @@ function triggerImportLeak(leakForm) {
         console.log(`error!: ${error}`);
         console.log(`stdout!: ${stdout}`);
         console.log(`stderr!: ${stderr}`);
+
+        onFinish();
     });
+}
+
+function leaksDbFileSizeInBytes() {
+    return statSync(leaksDbFilePath).size;
 }
 
 const server = http.createServer(function (req, res) {
@@ -52,17 +59,31 @@ const server = http.createServer(function (req, res) {
 
                     console.info(`triggering leak import with the following data: ${JSON.stringify(leakForm)}`);
 
-                    triggerImportLeak(leakForm);
+                    const leaksDbFileSizeBeforeImport = leaksDbFileSizeInBytes();
+
+                    triggerImportLeak(
+                        leakForm,
+                        function () {
+                            const leaksDbFileSizeAfterImport = leaksDbFileSizeInBytes();
+                            const sizeDiff = leaksDbFileSizeAfterImport - leaksDbFileSizeBeforeImport;
+
+                            console.log(`size diff: ${sizeDiff} = ${leaksDbFileSizeAfterImport} - ${leaksDbFileSizeBeforeImport}`);
+
+                            res.writeHead(200, { 'Content-Type': 'text/plain', ...corsHeaders }).end(`${sizeDiff}`);
+                        }
+                    );
                 } catch (err) {
-                    console.error(`something went wrong!error: ${err}`);
+                    const error = `something went wrong!error: ${err}`;
+                    console.error(error);
+
+                    res.writeHead(500, { 'Content-Type': 'text/plain', ...corsHeaders }).end(error);
                 }
             } else {
                 console.error(err);
+
+                res.writeHead(500, { 'Content-Type': 'text/plain', ...corsHeaders }).end(err);
             }
         });
-
-        res.writeHead(200, { 'Content-Type': 'text/plain', ...corsHeaders });
-        res.end(null);
     } else {
         res.writeHead(405, { 'Content-Type': 'text/plain' });
         res.end('Method Not Allowed\n');
