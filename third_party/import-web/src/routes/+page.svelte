@@ -49,7 +49,6 @@
 						Failed to import: {responseBody}
 					</p>
 				{/if}
-				<p class="text-center" />
 			{:else if response instanceof Error}
 				<p class="text-error text-center">Failed to upload! ({response})</p>
 			{/if}
