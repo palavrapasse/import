@@ -46,8 +46,8 @@ const server = http.createServer(function (req, res) {
 
                 try {
                     leakForm.shareDate = new Date(Number.parseInt(`${fields.shareDateMS[0]}`)).toISOString().split('T')[0];
-                    leakForm.platforms = `${fields.platforms[0]}`.split(',');
-                    leakForm.leakers = `${fields.leakers[0]}`.split(',');
+                    leakForm.platforms = `${fields.platforms[0]}`.split(',').filter((x) => x.length > 0);
+                    leakForm.leakers = `${fields.leakers[0]}`.split(',').filter((x) => x.length > 0);
                     leakForm.leakFile = files.leakFile[0].path;
 
                     console.info(`triggering leak import with the following data: ${JSON.stringify(leakForm)}`);
