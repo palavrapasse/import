@@ -66,3 +66,11 @@ To run the service container:
 ```bash
 docker run -p 3000:3000 -t $docker_tag -
 ```
+
+---
+
+Alternatively to `import-web` tool, there's also an handy bash script that triggers leak imports based on a `JSON` configuration file. To use it, make sure you copy the existing `args.json` template in [third-party/import-bash](third_party/import-bash/) and configure the leaks to import. Then, all you got to do is:
+
+```bash
+bash third_party/import-bash/run.bash
+```
