@@ -13,5 +13,6 @@ do
 
     docker run \
         --mount "type=bind,src=$leaksdb_fp,dst=$leaksdb_fp" \
+        --mount "type=bind,src=$leak_fp,dst=$leak_fp" \
         import --database-path="$leaksdb_fp" --leak-path="$leak_fp" --context="$context" --platforms="$platforms" --share-date="$share_date" --leakers="$leakers" --notify-url="$notify_url" --skip=true
 done < <( cat "$script_path/args.json" | jq -cr '.leaks[] | (.leak_fp, .context, .leakers, .platforms, .share_date)')
